@@ -60,7 +60,16 @@
     </div>
 
     <!-- modals -->
-    <TranscribingModal v-if="loading" :current-status="statusMsg"/>
+    <TranscribingModal v-if="loading && !showMetadataForm" :current-status="statusMsg"/>
+    
+    <ScoreMetadataForm
+      v-if="showMetadataForm"
+      :initial-data="aiResult.result.metadatos"
+      :loading="saving"
+      @save="handleSaveFinal"
+      @cancel="showMetadataForm = false"
+    />
+
     <AuthModal v-if="showAuth" initial-tab="login" @close="showAuth = false"/>
   </div>
 </template>
@@ -70,6 +79,7 @@ import { ref } from 'vue'
 import AppHeader from '../components/AppHeader.vue'
 import UploadDropzone from '../components/UploadDropzone.vue'
 import TranscribingModal from '../components/TranscribingModal.vue'
+import ScoreMetadataForm from '../components/ScoreMetadataForm.vue'
 import AuthModal from '../components/AuthModal.vue'
 import { useAuthStore } from '../stores/authStore.js'
 import { usePartituraController } from '../controllers/PartituraController.js'
@@ -77,10 +87,14 @@ import { usePartituraController } from '../controllers/PartituraController.js'
 const authStore = useAuthStore()
 const selectedFile = ref(null)
 const loading = ref(false)
+const saving = ref(false)
 const statusMsg = ref('')
 const transcriptionError = ref('')
 const lastResult = ref(null)
 const showAuth = ref(false)
+
+const showMetadataForm = ref(false)
+const aiResult = ref(null)
 
 const controller = usePartituraController(authStore.user?.id)
 
@@ -93,16 +107,34 @@ async function handleTranscribir() {
   lastResult.value = null
 
   try {
-    const result = await controller.subirYTranscribir(selectedFile.value, (msg) => {
+    const res = await controller.transcribirImagen(selectedFile.value, (msg) => {
       statusMsg.value = msg
     })
-    lastResult.value = result
-    selectedFile.value = null
+    aiResult.value = res
+    showMetadataForm.value = true
   } catch (e) {
     transcriptionError.value = e.message || 'Error durante la transcripción.'
   } finally {
     loading.value = false
     statusMsg.value = ''
+  }
+}
+
+async function handleSaveFinal(metadatosEditados) {
+  saving.value = true
+  try {
+    const id = await controller.guardarPartituraFinal({
+      ...aiResult.value,
+      metadatosEditados
+    }, (msg) => { statusMsg.value = msg })
+    
+    lastResult.value = { id_partitura: id, fiabilidad: aiResult.value.result.fiabilidad }
+    showMetadataForm.value = false
+    selectedFile.value = null
+  } catch (e) {
+    transcriptionError.value = e.message || 'Error al guardar la partitura.'
+  } finally {
+    saving.value = false
   }
 }
 

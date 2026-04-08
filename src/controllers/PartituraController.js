@@ -8,7 +8,8 @@ export function usePartituraController(userId) {
   const loading = ref(false)
   const error = ref(null)
 
-  async function subirYTranscribir(file, onStatusUpdate) {
+  //1.Sube la imagen y pide la transcripción a la IA
+  async function transcribirImagen(file, onStatusUpdate) {
     const validation = validateImageFile(file)
     if (!validation.valid) throw new Error(validation.error)
 
@@ -19,59 +20,68 @@ export function usePartituraController(userId) {
       const fileId = generateId()
       const imagePath = `${userId}/${fileId}/${file.name}`
 
-      //1.Subir imagen a Supabase Storage
+      // 1.1. Subir imagen a Storage
       onStatusUpdate?.('Subiendo imagen...')
       const imageUrl = await PartituraRepository.uploadImage(file, imagePath)
 
-      //2.Llamar al OMR
+      // 1.2. Llamar al OMR
       const omr = OMRService.getInstance()
       const result = await omr.transcribir(file, onStatusUpdate)
 
-      //3.Verificar fiabilidad
-      if (result.fiabilidad < 0.85) {
-        throw new Error(
-          `La fiabilidad de la transcripción es baja (${Math.round(result.fiabilidad * 100)}%). Por favor, verifique la calidad de la imagen.`
-        )
+      return {
+        fileId,
+        imageUrl,
+        result // { musicxml, fiabilidad, metadatos }
       }
+    } catch (e) {
+      error.value = e.message
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
 
-      //4.Subir MusicXML a Storage
-      onStatusUpdate?.('Guardando MusicXML...')
+  //2. Guarda definitivamente la partitura con los metadatos confirmados por el usuario.
+  async function guardarPartituraFinal(payload, onStatusUpdate) {
+    loading.value = true
+    const { fileId, imageUrl, result, metadatosEditados } = payload
+    console.log('[Controller] Guardando XML final:', result?.musicxml ? result.musicxml.substring(0, 100) + '...' : 'VACÍO')
+
+    try {
+      // 2.1. Subir MusicXML a Storage
+      onStatusUpdate?.('Guardando música...')
       const xmlPath = `${userId}/${fileId}/score.xml`
       const xmlUrl = await PartituraRepository.uploadMusicXML(result.musicxml, xmlPath)
 
-      //5.Guardar partitura en BD
-      onStatusUpdate?.('Guardando en tu biblioteca...')
+      // 2.2. Guardar en tabla 'partituras'
+      onStatusUpdate?.('Finalizando...')
       const partituraId = generateId()
       await PartituraRepository.setPartitura(partituraId, {
         id_partitura: partituraId,
         id_propietario: userId,
-        titulo: result.metadatos.titulo || 'Sin título',
-        autor: result.metadatos.autor || 'Desconocido',
-        instrumento: result.metadatos.instrumento || '',
-        genero: result.metadatos.genero || '',
-        ano_original: result.metadatos.anoOriginal || null,
+        titulo: metadatosEditados.titulo || 'Sin título',
+        autor: metadatosEditados.autor || 'Desconocido',
+        instrumento: metadatosEditados.instrumento || '',
+        genero: metadatosEditados.genero || '',
+        ano_original: metadatosEditados.ano_original || null,
         fecha_subida: new Date().toISOString(),
         es_publica: false,
       })
 
-      //6.Guardar transcripción
-      await PartituraRepository.setPartitura(`transcripcion_${partituraId}`, null) // replaced below
+      // 2.3. Guardar en tabla 'transcripciones'
       const db = (await import('../repositories/SupabaseClient.js')).default.getInstance().getDB()
       await db.from('transcripciones').insert({
         id_partitura: partituraId,
         ruta_imagen: imageUrl,
-        ruta_musicxml: xmlUrl,
+        ruta_resultado: xmlUrl,
         porcentaje_fiabilidad: result.fiabilidad,
-        musicxml_content: result.musicxml,
+        contenido_resultado: result.musicxml,
       })
 
-      return {
-        partituraId,
-        musicxml: result.musicxml,
-        fiabilidad: result.fiabilidad,
-        metadatos: result.metadatos,
-        imageUrl,
-      }
+      return partituraId
+    } catch (e) {
+      error.value = e.message
+      throw e
     } finally {
       loading.value = false
     }
@@ -89,5 +99,5 @@ export function usePartituraController(userId) {
     return PartituraRepository.updateMetadatos(id, datos)
   }
 
-  return { loading, error, subirYTranscribir, obtenerBiblioteca, eliminar, actualizarMetadatos }
+  return { loading, error, transcribirImagen, guardarPartituraFinal, obtenerBiblioteca, eliminar, actualizarMetadatos }
 }

@@ -114,6 +114,7 @@
       @descargar="handleDescargar"
       @compartir="handleCompartir"
       @eliminar="handleEliminar"
+      @actualizar="handleActualizar"
     />
 
     <!-- verovio viewer -->
@@ -260,6 +261,11 @@ function openDetail(p) { selectedPartitura.value = p }
 
 async function handleEliminar(id) {
   await ctrl.eliminar(id)
+  await loadPartituras()
+}
+
+async function handleActualizar(id, datos) {
+  await ctrl.actualizarMetadatos(id, datos)
   await loadPartituras()
 }
 
