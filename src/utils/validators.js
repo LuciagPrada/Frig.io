@@ -23,3 +23,22 @@ export function formatDate(date) {
 export function generateId() {
   return crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substr(2, 9)
 }
+
+export function formatTimeAgo(dateString) {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffInSeconds = Math.floor((now - date) / 1000)
+
+  if (diffInSeconds < 60) return `Hace ${diffInSeconds} s`
+  const minutes = Math.floor(diffInSeconds / 60)
+  if (minutes < 60) return `Hace ${minutes} m`
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `Hace ${hours} h`
+  const days = Math.floor(hours / 24)
+  if (days < 30) return `Hace ${days} días`
+  const months = Math.floor(days / 30)
+  if (months < 12) return `Hace ${months} meses`
+  const years = Math.floor(days / 365)
+  return `Hace ${years} años`
+}

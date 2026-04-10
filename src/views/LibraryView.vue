@@ -14,6 +14,9 @@
             <button class="tab-btn" :class="{ active: activeTab === 'institucion' }" @click="switchTab('institucion')">
               Biblioteca institucional
             </button>
+            <button class="tab-btn" :class="{ active: activeTab === 'favoritos' }" @click="switchTab('favoritos')">
+              Me gusta
+            </button>
           </div>
 
           <!-- subtabs de instituciones cuando hay varias -->
@@ -35,12 +38,15 @@
 
           <h1 class="page-title" style="display:flex;align-items:center;gap:0.75rem;margin:0 0 0.5rem">
             <svg v-if="activeTab === 'personal'" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+            <svg v-else-if="activeTab === 'favoritos'" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             <svg v-else width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"/></svg>
-            {{ activeTab === 'personal' ? 'Tu biblioteca' : tituloInstitucion }}
+            {{ activeTab === 'personal' ? 'Tu biblioteca' : activeTab === 'favoritos' ? 'Partituras que te gustan' : tituloInstitucion }}
           </h1>
           <p class="page-subtitle" style="margin-bottom:0">
             {{ activeTab === 'personal'
               ? 'Aquí se guardan las partituras que hayas escaneado para que puedas revisarlas cuando quieras'
+              : activeTab === 'favoritos'
+              ? 'Partituras de la comunidad y tu institución que has guardado'
               : 'Partituras compartidas con tu institución' }}
           </p>
         </div>
@@ -99,6 +105,8 @@
         <p style="color:var(--color-text-secondary);margin:0 0 1.5rem">
           {{ activeTab === 'personal'
             ? 'Transcribe tu primera partitura para empezar'
+            : activeTab === 'favoritos'
+            ? 'Aún no has guardado ninguna partitura que te guste'
             : 'Tu institución no tiene partituras compartidas aún' }}
         </p>
         <router-link to="/dashboard" class="btn btn-primary">Transcribir partitura</router-link>
@@ -109,7 +117,7 @@
     <ScoreDetailModal
       v-if="selectedPartitura"
       :partitura="selectedPartitura"
-      @close="selectedPartitura = null"
+      @close="selectedPartitura = null; loadPartituras()"
       @reproducir="handleReproducir"
       @descargar="handleDescargar"
       @compartir="handleCompartir"
@@ -237,6 +245,8 @@ async function loadPartituras() {
   try {
     if (activeTab.value === 'personal') {
       partituras.value = await ctrl.obtenerBiblioteca()
+    } else if (activeTab.value === 'favoritos') {
+      partituras.value = await ctrl.obtenerFavoritos()
     } else if (instFiltro.value) {
       partituras.value = await instCtrl.getBibliotecaInstitucion(instFiltro.value)
     } else {
@@ -286,11 +296,30 @@ function handleDescargar(p) {
   URL.revokeObjectURL(url)
 }
 
-async function handleCompartir(p) {
-  await import('../repositories/PartituraRepository.js').then(m =>
-    m.default.updateMetadatos(p.id_partitura, { es_publica: true, es_privada: false, es_institucional: false })
-  )
-  alert('La partitura ha sido compartida en la comunidad.')
+async function handleCompartir(p, tipo) {
+  if (tipo === 'institucion') {
+    if (!instCtrl.instituciones.value.length) {
+      alert('Debes unirte o crear una institución primero para poder compartir partituras con ella.')
+      showUnirseModal.value = true
+      return
+    }
+    const instId = instFiltro.value || instCtrl.instituciones.value[0].id_institucion
+    await import('../repositories/PartituraRepository.js').then(m =>
+      m.default.updateMetadatos(p.id_partitura, { es_publica: false, es_privada: false, es_institucional: true, id_institucion: instId })
+    )
+    alert('La partitura ha sido movida a tu institución.')
+  } else if (tipo === 'comunidad') {
+    await import('../repositories/PartituraRepository.js').then(m =>
+      m.default.updateMetadatos(p.id_partitura, { es_publica: true, es_privada: false, es_institucional: false })
+    )
+    alert('La partitura se ha publicado en la comunidad.')
+  } else if (tipo === 'privada') {
+    await import('../repositories/PartituraRepository.js').then(m =>
+      m.default.updateMetadatos(p.id_partitura, { es_publica: false, es_privada: true, es_institucional: false, id_institucion: null })
+    )
+    alert('La partitura vuelve a ser totalmente privada.')
+  }
+  await loadPartituras()
 }
 
 async function handleCrear() {
