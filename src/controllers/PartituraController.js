@@ -99,5 +99,9 @@ export function usePartituraController(userId) {
     return PartituraRepository.updateMetadatos(id, datos)
   }
 
-  return { loading, error, transcribirImagen, guardarPartituraFinal, obtenerBiblioteca, eliminar, actualizarMetadatos }
+  async function obtenerFavoritos() {
+    return PartituraRepository.getLikedPartituras(userId)
+  }
+
+  return { loading, error, transcribirImagen, guardarPartituraFinal, obtenerBiblioteca, obtenerFavoritos, eliminar, actualizarMetadatos }
 }

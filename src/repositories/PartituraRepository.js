@@ -16,10 +16,12 @@ const PartituraRepository = {
     const db = getDB()
     const { data, error } = await db
       .from('partituras')
-      .select('*, transcripciones(*)')
+      .select('*, transcripciones(*), likes(count), total_comentarios')
       .eq('id_propietario', uid)
-      .order('fecha_subida', { ascending: false })
-    if (error) throw error
+    if (error) {
+      console.error('Error getPartiturasPorUsuario:', error)
+      return []
+    }
     return data || []
   },
 
@@ -32,8 +34,11 @@ const PartituraRepository = {
 
   async updateMetadatos(id, metadatos) {
     const db = getDB()
-    const { error } = await db.from('partituras').update(metadatos).eq('id_partitura', id)
+    const { data, error } = await db.from('partituras').update(metadatos).eq('id_partitura', id).select()
     if (error) throw error
+    if (!data || data.length === 0) {
+      alert("Error crítico: la base de datos ignoró el comando (0 filas actualizadas). Posible bloqueo por permisos RLS o la partitura no te pertenece.")
+    }
     return true
   },
 
@@ -41,7 +46,7 @@ const PartituraRepository = {
     const db = getDB()
     let q = db
       .from('partituras')
-      .select('*, transcripciones(*), usuarios(nickname, nombre, avatar_url, avatar_seed), likes(count), comentarios(count)')
+      .select('*, transcripciones(*), usuarios!partituras_id_propietario_fkey(nickname, nombre, avatar_url, avatar_seed), likes(count), total_comentarios')
       .eq('es_publica', true)
       .order('fecha_subida', { ascending: false })
 
@@ -49,7 +54,10 @@ const PartituraRepository = {
       q = q.or(`titulo.ilike.%${query}%,autor.ilike.%${query}%`)
     }
     const { data, error } = await q
-    if (error) throw error
+    if (error) {
+      console.error('Error getPublicFeed:', error)
+      return []
+    }
     return data || []
   },
 
@@ -58,10 +66,13 @@ const PartituraRepository = {
     const db = getDB()
     const { data, error } = await db
       .from('partituras')
-      .select('*, transcripciones(*), usuarios(nickname, nombre, avatar_url, avatar_seed)')
+      .select('*, transcripciones(*), usuarios!partituras_id_propietario_fkey(nickname, nombre, avatar_url, avatar_seed), total_comentarios')
       .eq('id_partitura', partituraId)
       .single()
-    if (error) throw error
+    if (error) {
+      console.error('Error getPartituraCommunityDetail:', error)
+      throw error
+    }
     return data
   },
 
@@ -96,6 +107,29 @@ const PartituraRepository = {
     return (data || []).map(l => l.id_partitura)
   },
 
+  async getLikedPartituras(userId) {
+    const db = getDB()
+    const { data, error } = await db
+      .from('likes')
+      .select(`
+        id_partitura,
+        partituras (
+          *,
+          transcripciones(*),
+          likes(count),
+          total_comentarios,
+          usuarios!partituras_id_propietario_fkey(nickname, nombre, avatar_url, avatar_seed)
+        )
+      `)
+      .eq('id_usuario', userId)
+    if (error) {
+      console.error('Error getLikedPartituras:', error)
+      return []
+    }
+    const partituras = (data || []).map(l => l.partituras).filter(p => p && p.id_propietario !== userId)
+    return partituras.sort((a, b) => new Date(b.fecha_subida || 0) - new Date(a.fecha_subida || 0))
+  },
+
   async uploadImage(file, path) {
     const storage = getStorage()
     const { data, error } = await storage
@@ -121,10 +155,13 @@ const PartituraRepository = {
     const db = getDB()
     const { data, error } = await db
       .from('partituras')
-      .select('*, transcripciones(*)')
+      .select('*, transcripciones(*), likes(count), total_comentarios')
       .eq('id_institucion', instId)
       .order('fecha_subida', { ascending: false })
-    if (error) throw error
+    if (error) {
+      console.error('Error getPartiturasByInstitucion:', error)
+      return []
+    }
     return data || []
   },
 }

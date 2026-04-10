@@ -71,7 +71,7 @@
     <ScoreDetailModal
       v-if="selectedPartitura"
       :partitura="selectedPartitura"
-      @close="selectedPartitura = null"
+      @close="selectedPartitura = null; getFeed()"
       @reproducir="handleReproducir"
       @descargar="handleDescargar"
       @compartir="() => {}"
