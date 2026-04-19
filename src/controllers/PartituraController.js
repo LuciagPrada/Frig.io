@@ -70,13 +70,14 @@ export function usePartituraController(userId) {
 
       // 2.3. Guardar en tabla 'transcripciones'
       const db = (await import('../repositories/SupabaseClient.js')).default.getInstance().getDB()
-      await db.from('transcripciones').insert({
+      const { error: errorTrans } = await db.from('transcripciones').insert({
         id_partitura: partituraId,
         ruta_imagen: imageUrl,
         ruta_resultado: xmlUrl,
         porcentaje_fiabilidad: result.fiabilidad,
         contenido_resultado: result.musicxml,
       })
+      if (errorTrans) throw errorTrans
 
       return partituraId
     } catch (e) {

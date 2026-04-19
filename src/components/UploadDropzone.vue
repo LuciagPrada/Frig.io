@@ -10,7 +10,7 @@
     <input
       ref="inputRef"
       type="file"
-      accept="image/jpeg,image/png"
+      accept="image/jpeg,image/png,application/pdf"
       style="display:none"
       @change="onFileChange"
     />
@@ -27,7 +27,7 @@
         o arrastra y suelta tu archivo aquí
       </p>
       <p style="color:var(--color-text-secondary);font-size:0.75rem;margin:0.5rem 0 0">
-        JPG, PNG — máx. 10 MB
+        JPG, PNG, PDF — máx. 10 MB
       </p>
     </div>
 

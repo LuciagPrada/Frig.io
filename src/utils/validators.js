@@ -1,11 +1,11 @@
 //Utils, validadores y formateadores de archivo
 export const MAX_FILE_SIZE_MB = 10
-export const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/jpg']
+export const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf']
 
 export function validateImageFile(file) {
   if (!file) return { valid: false, error: 'No se ha seleccionado ningún archivo.' }
   if (!ALLOWED_TYPES.includes(file.type)) {
-    return { valid: false, error: 'Formato no admitido. Solo se permiten imágenes JPEG y PNG.' }
+    return { valid: false, error: 'Formato no admitido. Se permiten imágenes (JPEG, PNG) y archivos PDF.' }
   }
   const sizeMB = file.size / (1024 * 1024)
   if (sizeMB > MAX_FILE_SIZE_MB) {
