@@ -10,6 +10,10 @@
           La IA ha detectado estos datos. Por favor, corrígelos si es necesario.
         </p>
       </div>
+      <div v-if="errorMsg" class="alert alert-error" style="margin-bottom:1.5rem;display:flex;align-items:center;gap:0.5rem">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        {{ errorMsg }}
+      </div>
 
       <form @submit.prevent="handleSubmit">
         <div class="form-group">
@@ -42,7 +46,7 @@
           <button type="button" class="btn btn-secondary" style="flex:1" @click="$emit('cancel')">Descartar</button>
           <button type="submit" class="btn btn-primary" style="flex:1" :disabled="loading">
             <span v-if="loading" class="spinner spinner-sm" style="margin-right:0.5rem"/>
-            Guardar Partitura
+            {{ loading && statusMsg ? statusMsg : 'Guardar Partitura' }}
           </button>
         </div>
       </form>
@@ -55,7 +59,9 @@ import { reactive } from 'vue'
 
 const props = defineProps({
   initialData: { type: Object, default: () => ({}) },
-  loading: { type: Boolean, default: false }
+  loading: { type: Boolean, default: false },
+  errorMsg: { type: String, default: '' },
+  statusMsg: { type: String, default: '' }
 })
 
 const emit = defineEmits(['save', 'cancel'])

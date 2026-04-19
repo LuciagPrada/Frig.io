@@ -66,6 +66,7 @@
       v-if="showMetadataForm"
       :initial-data="aiResult.result.metadatos"
       :loading="saving"
+      :error-msg="transcriptionError"
       @save="handleSaveFinal"
       @cancel="showMetadataForm = false"
     />
@@ -122,6 +123,7 @@ async function handleTranscribir() {
 
 async function handleSaveFinal(metadatosEditados) {
   saving.value = true
+  transcriptionError.value = ''
   try {
     const id = await controller.guardarPartituraFinal({
       ...aiResult.value,
@@ -132,7 +134,8 @@ async function handleSaveFinal(metadatosEditados) {
     showMetadataForm.value = false
     selectedFile.value = null
   } catch (e) {
-    transcriptionError.value = e.message || 'Error al guardar la partitura.'
+    // El error ahora se pasa al modal para que el usuario lo vea.
+    transcriptionError.value = e.message || JSON.stringify(e) || 'Error al guardar la partitura.'
   } finally {
     saving.value = false
   }
