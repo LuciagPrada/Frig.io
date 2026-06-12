@@ -75,7 +75,7 @@
                   <td style="padding:0.4rem 0;color:var(--color-text-secondary);font-size:0.875rem;width:40%">{{ row.label }}</td>
                   <td style="padding:0.4rem 0;font-weight:500;font-size:0.875rem">
                     <template v-if="!isEditing || row.key === 'fecha_subida'">
-                      {{ row.value || '—' }}
+                      {{ row.value || '-' }}
                     </template>
                     <template v-else>
                       <input v-if="row.key === 'ano_original'" v-model="editForm[row.key]" type="number" class="form-input" style="padding:2px 8px;height:auto"/>

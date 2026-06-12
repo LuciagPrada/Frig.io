@@ -43,7 +43,7 @@
         </h2>
         <p style="color:var(--color-text-secondary);line-height:1.7;margin:0">
           Esta es una aplicación de <strong>transcripción de partituras manuscritas</strong> que utiliza tecnología de
-          <strong>OMR (Optical Music Recognition)</strong> — Reconocimiento Óptico Musical. Similar a MuseScore,
+          <strong>OMR (Optical Music Recognition)</strong> Reconocimiento Óptico Musical. Similar a MuseScore,
           permite convertir imágenes de partituras escritas a mano en archivos digitales editables y reproducibles.
           El sistema está diseñado para compositores, estudiantes y profesores de música que necesitan digitalizar
           sus partituras de forma rápida y precisa.
