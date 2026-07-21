@@ -67,22 +67,10 @@ const thumbnailUrl = computed(() =>
   props.partitura.thumbnail_url || null
 )
 
-const likesCount = computed(() => {
-  const l = props.partitura.likes
-  if (!l) return 0
-  if (Array.isArray(l)) return l[0]?.count ?? l.length
-  if (typeof l === 'object' && l.count !== undefined) return l.count
-  return Number(l) || 0
-})
-
-const comentariosCount = computed(() => {
-  if (props.partitura.total_comentarios !== undefined) return props.partitura.total_comentarios
-  const c = props.partitura.comentarios
-  if (!c) return 0
-  if (Array.isArray(c)) return c[0]?.count ?? c.length
-  if (typeof c === 'object' && c.count !== undefined) return c.count
-  return Number(c) || 0
-})
+//Supabase siempre devuelve los conteos embebidos (`likes(count)`) como
+//[{ count: N }]; `total_comentarios` es una columna calculada (ya es un número).
+const likesCount = computed(() => props.partitura.likes?.[0]?.count ?? 0)
+const comentariosCount = computed(() => props.partitura.total_comentarios ?? 0)
 </script>
 
 <style scoped>

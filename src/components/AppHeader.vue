@@ -41,7 +41,7 @@
 
       <div style="position:relative">
         <button class="avatar-btn" @click="toggleDropdown" style="padding:0;border-radius:50%;overflow:hidden;border:2px solid var(--color-teal);width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:var(--color-bg)">
-          <img v-if="authStore.user?.avatar_seed" :src="`https://api.dicebear.com/9.x/avataaars/svg?seed=${authStore.user.avatar_seed}`" alt="Avatar" style="width:100%;height:100%;object-fit:cover"/>
+          <img v-if="authStore.user?.avatar_seed && !avatarLoadFailed" :src="`https://api.dicebear.com/9.x/avataaars/svg?seed=${authStore.user.avatar_seed}`" alt="Avatar" style="width:100%;height:100%;object-fit:cover" @error="avatarLoadFailed = true"/>
           <svg v-else width="40" height="40" viewBox="0 0 40 40" fill="none">
             <circle cx="20" cy="20" r="20" fill="rgba(15,23,42,0.12)"/>
             <circle cx="20" cy="16" r="7" fill="rgba(15,23,42,0.55)"/>
@@ -83,6 +83,7 @@ const appName = 'Frig.io'
 const authStore = useAuthStore()
 const router = useRouter()
 const dropdownOpen = ref(false)
+const avatarLoadFailed = ref(false)
 
 function toggleDropdown() { dropdownOpen.value = !dropdownOpen.value }
 function closeDropdown() { dropdownOpen.value = false }

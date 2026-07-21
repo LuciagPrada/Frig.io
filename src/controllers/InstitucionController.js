@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 import InstitucionRepository from '../repositories/InstitucionRepository.js'
 import PartituraRepository from '../repositories/PartituraRepository.js'
-import SupabaseClient from '../repositories/SupabaseClient.js'
 import { useAuthStore } from '../stores/authStore.js'
 
 export function useInstitucionController() {
@@ -68,15 +67,9 @@ export function useInstitucionController() {
 
   //Invita a un usuario a una institución específica buscándolo por email
   async function invitarMiembro(instId, email) {
-    const db = SupabaseClient.getInstance().getDB()
-    const { data: usuario, error: findError } = await db
-      .from('usuarios')
-      .select('id')
-      .eq('email', email)
-      .single()
-
-    if (findError || !usuario) throw new Error('No se encontró ningún usuario con ese email.')
-    await InstitucionRepository.addMiembro(instId, usuario.id)
+    const usuarioId = await InstitucionRepository.buscarUsuarioPorEmail(email)
+    if (!usuarioId) throw new Error('No se encontró ningún usuario con ese email.')
+    await InstitucionRepository.addMiembro(instId, usuarioId)
     await cargar()
   }
 
@@ -84,10 +77,6 @@ export function useInstitucionController() {
   async function getBibliotecaInstitucion(instId) {
     return PartituraRepository.getPartiturasByInstitucion(instId)
   }
-
-  //devuelve la primera institución administrada
-  const institucion = ref(null)
-  const miembros = ref([])
 
   return {
     instituciones,
@@ -98,8 +87,5 @@ export function useInstitucionController() {
     getBibliotecaInstitucion,
     loading,
     error,
-    //compatibilidad con InstitucionView
-    institucion,
-    miembros,
   }
 }

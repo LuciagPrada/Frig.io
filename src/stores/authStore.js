@@ -10,38 +10,45 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAuthenticated = computed(() => !!user.value)
   const isAdmin = computed(() => user.value?.rol === 'ADMINISTRADOR')
-  const isCreadorInstitucion = computed(() => isAdmin.value)
 
   async function init() {
     loading.value = true
     const session = await AuthRepository.getSession()
     if (session?.user) {
-      await _loadProfile(session.user.id)
+      await _loadProfile(session.user.id, session.user.email)
     }
     loading.value = false
 
     //Escuchar cambios de auth
     AuthRepository.onAuthStateChange(async (event, session) => {
       if (session?.user) {
-        await _loadProfile(session.user.id)
+        await _loadProfile(session.user.id, session.user.email)
       } else {
         user.value = null
       }
     })
   }
 
-  async function _loadProfile(uid) {
+  //El email no se lee de la tabla usuarios (columna restringida por RLS/privilegios),
+  //se toma de la sesión de Supabase Auth, que ya lo incluye.
+  async function _loadProfile(uid, email) {
     const db = SupabaseClient.getInstance().getDB()
-    const { data } = await db.from('usuarios').select('*').eq('id', uid).single()
-    user.value = data || { id: uid }
+    const { data } = await db
+      .from('usuarios')
+      .select('id, nombre, apellidos, nickname, rol, avatar_seed, avatar_url, last_profile_update, created_at')
+      .eq('id', uid)
+      .single()
+    user.value = data ? { ...data, email } : { id: uid, email }
   }
 
   async function login(email, pass) {
-    await AuthRepository.login(email, pass)
+    const data = await AuthRepository.login(email, pass)
+    if (data?.user) await _loadProfile(data.user.id, data.user.email)
   }
 
   async function register(datos) {
-    await AuthRepository.register(datos)
+    const data = await AuthRepository.register(datos)
+    if (data?.user) await _loadProfile(data.user.id, data.user.email)
   }
 
   async function logout() {
@@ -49,5 +56,11 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = null
   }
 
-  return { user, loading, isAuthenticated, isAdmin, isCreadorInstitucion, init, login, register, logout }
+  async function deleteAccount() {
+    await AuthRepository.deleteAccount()
+    try { await AuthRepository.logout() } catch (e) { /* cuenta ya borrada, seguir igualmente */ }
+    user.value = null
+  }
+
+  return { user, loading, isAuthenticated, isAdmin, init, login, register, logout, deleteAccount }
 })

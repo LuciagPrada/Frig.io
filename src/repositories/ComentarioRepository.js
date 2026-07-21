@@ -79,42 +79,6 @@ const ComentarioRepository = {
     if (error) throw error
     return true
   },
-
-  //Crea una respuesta (mensaje) a un comentario existente
-  async addMensaje(comentarioId, userId, contenido) {
-    if (!contenido?.trim()) throw new Error('La respuesta no puede estar vacía.')
-    const db = getDB()
-    const { data, error } = await db
-      .from('mensajes')
-      .insert({ id_comentario: comentarioId, id_usuario: userId, contenido: contenido.trim() })
-      .select()
-      .single()
-    if (error) throw error
-    return data
-  },
-
-  //Elimina una respuesta
-  /*async deleteMensaje(mensajeId, userId) {
-    const db = getDB()
-    const { error } = await db
-      .from('mensajes')
-      .delete()
-      .eq('id_mensaje', mensajeId)
-      .eq('id_usuario', userId)
-    if (error) throw error
-    return true
-  },*/
-
-  //Cuenta el total de comentarios+mensajes de una partitura
-  async countInteracciones(partituraId) {
-    const db = getDB()
-    const { count, error } = await db
-      .from('comentarios')
-      .select('id_comentario', { count: 'exact', head: true })
-      .eq('id_partitura', partituraId)
-    if (error) throw error
-    return count || 0
-  },
 }
 
 export default ComentarioRepository

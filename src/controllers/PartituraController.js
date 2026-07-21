@@ -3,10 +3,15 @@ import { ref } from 'vue'
 import PartituraRepository from '../repositories/PartituraRepository.js'
 import OMRService from '../services/OMRService.js'
 import { validateImageFile, generateId } from '../utils/validators.js'
+import { useAuthStore } from '../stores/authStore.js'
 
-export function usePartituraController(userId) {
+export function usePartituraController() {
   const loading = ref(false)
   const error = ref(null)
+
+  function getUserId() {
+    return useAuthStore().user?.id
+  }
 
   //1.Sube la imagen y pide la transcripción a la IA
   async function transcribirImagen(file, onStatusUpdate) {
@@ -18,7 +23,7 @@ export function usePartituraController(userId) {
 
     try {
       const fileId = generateId()
-      const imagePath = `${userId}/${fileId}/${file.name}`
+      const imagePath = `${getUserId()}/${fileId}/${file.name}`
 
       // 1.1. Subir imagen a Storage
       onStatusUpdate?.('Subiendo imagen...')
@@ -45,12 +50,11 @@ export function usePartituraController(userId) {
   async function guardarPartituraFinal(payload, onStatusUpdate) {
     loading.value = true
     const { fileId, imageUrl, result, metadatosEditados } = payload
-    console.log('[Controller] Guardando XML final:', result?.musicxml ? result.musicxml.substring(0, 100) + '...' : 'VACÍO')
 
     try {
       // 2.1. Subir MusicXML a Storage
       onStatusUpdate?.('Guardando música...')
-      const xmlPath = `${userId}/${fileId}/score.xml`
+      const xmlPath = `${getUserId()}/${fileId}/score.xml`
       const xmlUrl = await PartituraRepository.uploadMusicXML(result.musicxml, xmlPath)
 
       // 2.2. Guardar en tabla 'partituras'
@@ -58,7 +62,7 @@ export function usePartituraController(userId) {
       const partituraId = generateId()
       await PartituraRepository.setPartitura(partituraId, {
         id_partitura: partituraId,
-        id_propietario: userId,
+        id_propietario: getUserId(),
         titulo: metadatosEditados.titulo || 'Sin título',
         autor: metadatosEditados.autor || 'Desconocido',
         instrumento: metadatosEditados.instrumento || '',
@@ -69,15 +73,13 @@ export function usePartituraController(userId) {
       })
 
       // 2.3. Guardar en tabla 'transcripciones'
-      const db = (await import('../repositories/SupabaseClient.js')).default.getInstance().getDB()
-      const { error: errorTrans } = await db.from('transcripciones').insert({
+      await PartituraRepository.addTranscripcion({
         id_partitura: partituraId,
         ruta_imagen: imageUrl,
         ruta_resultado: xmlUrl,
         porcentaje_fiabilidad: result.fiabilidad,
         contenido_resultado: result.musicxml,
       })
-      if (errorTrans) throw errorTrans
 
       return partituraId
     } catch (e) {
@@ -89,7 +91,7 @@ export function usePartituraController(userId) {
   }
 
   async function obtenerBiblioteca() {
-    return PartituraRepository.getPartiturasPorUsuario(userId)
+    return PartituraRepository.getPartiturasPorUsuario(getUserId())
   }
 
   async function eliminar(id) {
@@ -101,7 +103,7 @@ export function usePartituraController(userId) {
   }
 
   async function obtenerFavoritos() {
-    return PartituraRepository.getLikedPartituras(userId)
+    return PartituraRepository.getLikedPartituras(getUserId())
   }
 
   return { loading, error, transcribirImagen, guardarPartituraFinal, obtenerBiblioteca, obtenerFavoritos, eliminar, actualizarMetadatos }

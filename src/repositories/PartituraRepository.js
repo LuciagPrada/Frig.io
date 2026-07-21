@@ -12,6 +12,13 @@ const PartituraRepository = {
     return true
   },
 
+  async addTranscripcion(datos) {
+    const db = getDB()
+    const { error } = await db.from('transcripciones').insert(datos)
+    if (error) throw error
+    return true
+  },
+
   async getPartiturasPorUsuario(uid) {
     const db = getDB()
     const { data, error } = await db
@@ -51,7 +58,11 @@ const PartituraRepository = {
       .order('fecha_subida', { ascending: false })
 
     if (query) {
-      q = q.or(`titulo.ilike.%${query}%,autor.ilike.%${query}%`)
+      //Las comas y paréntesis tienen significado especial en la sintaxis de
+      //filtros de PostgREST (.or(...)): se quitan para que el texto de
+      //búsqueda no pueda inyectar condiciones adicionales.
+      const safeQuery = query.replace(/[,()]/g, '')
+      q = q.or(`titulo.ilike.%${safeQuery}%,autor.ilike.%${safeQuery}%`)
     }
     const { data, error } = await q
     if (error) {

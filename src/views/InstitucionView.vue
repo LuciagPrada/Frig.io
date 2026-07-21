@@ -190,6 +190,7 @@
                   <th style="padding:0.6rem 1.25rem;text-align:left;font-size:0.75rem;color:var(--color-text-secondary);font-weight:600;text-transform:uppercase">Nombre</th>
                   <th style="padding:0.6rem 1.25rem;text-align:left;font-size:0.75rem;color:var(--color-text-secondary);font-weight:600;text-transform:uppercase">Email</th>
                   <th style="padding:0.6rem 1.25rem;text-align:left;font-size:0.75rem;color:var(--color-text-secondary);font-weight:600;text-transform:uppercase">Rol</th>
+                  <th v-if="instSeleccionada.rolUsuario === 'ADMINISTRADOR'" style="padding:0.6rem 1.25rem;text-align:right;font-size:0.75rem;color:var(--color-text-secondary);font-weight:600;text-transform:uppercase">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -201,9 +202,14 @@
                       {{ m.usuarios?.rol === 'ADMINISTRADOR' ? 'Admin' : 'Miembro' }}
                     </span>
                   </td>
+                  <td v-if="instSeleccionada.rolUsuario === 'ADMINISTRADOR'" style="padding:0.75rem 1.25rem;text-align:right">
+                    <button v-if="m.id_usuario !== authStore.user?.id" class="btn-icon" style="margin-left:auto" @click="confirmarEliminarMiembro(m)" title="Eliminar miembro">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                    </button>
+                  </td>
                 </tr>
                 <tr v-if="!(instSeleccionada.miembros_institucion || []).length">
-                  <td colspan="3" style="padding:1.25rem;text-align:center;color:var(--color-text-secondary)">No hay miembros todavía</td>
+                  <td :colspan="instSeleccionada.rolUsuario === 'ADMINISTRADOR' ? 4 : 3" style="padding:1.25rem;text-align:center;color:var(--color-text-secondary)">No hay miembros todavía</td>
                 </tr>
               </tbody>
             </table>
@@ -247,7 +253,6 @@
           <h2 style="margin:0 0 0.75rem;font-size:1.1rem;font-weight:700">¿Salirte de la institución?</h2>
           <p style="color:var(--color-text-secondary);font-size:0.9rem;margin:0">
             Perderás el acceso a las partituras institucionales de <strong>{{ instSeleccionada?.nombre }}</strong>.
-            Recibirás un email de confirmación.
           </p>
         </div>
         <div v-if="actionError" class="alert alert-error" style="margin-bottom:1rem">{{ actionError }}</div>
@@ -270,7 +275,7 @@
           </div>
           <h2 style="margin:0 0 0.75rem;font-size:1.1rem;font-weight:700">¿Eliminar la institución?</h2>
           <p style="color:var(--color-text-secondary);font-size:0.9rem;margin:0">
-            Se eliminará <strong>{{ instSeleccionada?.nombre }}</strong> y todos sus miembros recibirán un email notificándolo.
+            Se eliminará <strong>{{ instSeleccionada?.nombre }}</strong> y todos sus miembros perderán el acceso.
             Esta acción <strong>no se puede deshacer</strong>.
           </p>
         </div>
@@ -278,6 +283,30 @@
         <div style="display:flex;gap:0.75rem;justify-content:center">
           <button class="btn btn-secondary" @click="showConfirmEliminar = false">Cancelar</button>
           <button class="btn btn-danger" @click="handleEliminar" :disabled="instCtrl.loading.value">
+            <span v-if="instCtrl.loading.value" class="spinner spinner-sm"/>
+            Sí, eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- confirmar eliminar miembro -->
+    <div v-if="showConfirmEliminarMiembro" class="modal-overlay" @click.self="showConfirmEliminarMiembro = false">
+      <div class="modal-box card" style="max-width:420px;width:90%;padding:2rem">
+        <div style="text-align:center;margin-bottom:1.5rem">
+          <div style="width:56px;height:56px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          </div>
+          <h2 style="margin:0 0 0.75rem;font-size:1.1rem;font-weight:700">¿Eliminar al miembro?</h2>
+          <p style="color:var(--color-text-secondary);font-size:0.9rem;margin:0">
+            <strong>{{ memberAEliminar?.usuarios?.nombre }} {{ memberAEliminar?.usuarios?.apellidos }}</strong> ({{ memberAEliminar?.usuarios?.email }})
+            perderá el acceso a las partituras institucionales.
+          </p>
+        </div>
+        <div v-if="actionError" class="alert alert-error" style="margin-bottom:1rem">{{ actionError }}</div>
+        <div style="display:flex;gap:0.75rem;justify-content:center">
+          <button class="btn btn-secondary" @click="showConfirmEliminarMiembro = false">Cancelar</button>
+          <button class="btn btn-danger" @click="handleEliminarMiembro" :disabled="instCtrl.loading.value">
             <span v-if="instCtrl.loading.value" class="spinner spinner-sm"/>
             Sí, eliminar
           </button>
@@ -294,11 +323,6 @@ import AuthModal from '../components/AuthModal.vue'
 import { useAuthStore } from '../stores/authStore.js'
 import { useInstitucionController } from '../controllers/InstitucionController.js'
 import InstitucionRepository from '../repositories/InstitucionRepository.js'
-import {
-  sendSalidaInstitucion,
-  sendEliminacionInstitucion,
-  sendInvitacionInstitucion,
-} from '../services/EmailService.js'
 
 const authStore = useAuthStore()
 const instCtrl = useInstitucionController()
@@ -311,6 +335,8 @@ const showUnirse = ref(false)
 const instSeleccionada = ref(null)
 const showConfirmSalir = ref(false)
 const showConfirmEliminar = ref(false)
+const showConfirmEliminarMiembro = ref(false)
+const memberAEliminar = ref(null)
 
 const nombreNueva = ref('')
 const descNueva = ref('')
@@ -351,17 +377,8 @@ async function handleInvitar() {
   try {
     await instCtrl.invitarMiembro(instSeleccionada.value.id_institucion, emailInvitacion.value)
     const instActualizada = instituciones.value.find(i => i.id_institucion === instSeleccionada.value.id_institucion)
-    const miembroNuevo = instActualizada?.miembros_institucion?.find(m => m.usuarios?.email === emailInvitacion.value)
 
-    //Email de bienvenida al nuevo miembro 
-    sendInvitacionInstitucion({
-      emailUsuario:      emailInvitacion.value,
-      nombreUsuario:     miembroNuevo?.usuarios?.nombre || '',
-      nombreInstitucion: instSeleccionada.value.nombre,
-      appUrl:            window.location.origin,
-    }).catch(err => console.warn('[Email]', err.message))
-
-    gestionSuccess.value = 'Miembro añadido. Se ha enviado un email de bienvenida.'
+    gestionSuccess.value = 'Miembro añadido.'
     emailInvitacion.value = ''
     if (instActualizada) instSeleccionada.value = instActualizada
   } catch (e) { inviteError.value = e.message || 'Error al invitar al miembro' }
@@ -369,20 +386,13 @@ async function handleInvitar() {
 
 function confirmarSalir()    { actionError.value = ''; showConfirmSalir.value = true }
 function confirmarEliminar() { actionError.value = ''; showConfirmEliminar.value = true }
+function confirmarEliminarMiembro(m) { actionError.value = ''; memberAEliminar.value = m; showConfirmEliminarMiembro.value = true }
 
 async function handleSalir() {
   actionError.value = ''
   try {
     const uid = authStore.user?.id
-    const nombreInst = instSeleccionada.value.nombre
     await InstitucionRepository.removeMiembro(instSeleccionada.value.id_institucion, uid)
-
-    //Email de confirmación  al usuario
-    sendSalidaInstitucion({
-      emailUsuario:      authStore.user?.email,
-      nombreUsuario:     authStore.user?.nombre || '',
-      nombreInstitucion: nombreInst,
-    }).catch(err => console.warn('[Email]', err.message))
 
     showConfirmSalir.value = false
     instSeleccionada.value = null
@@ -393,20 +403,25 @@ async function handleSalir() {
 async function handleEliminar() {
   actionError.value = ''
   try {
-    const nombreInst = instSeleccionada.value.nombre
-    const emails = (instSeleccionada.value.miembros_institucion || [])
-      .map(m => m.usuarios?.email).filter(Boolean)
-
     await InstitucionRepository.eliminar(instSeleccionada.value.id_institucion)
-
-    // Email a todos los miembros
-    sendEliminacionInstitucion({ emails, nombreInstitucion: nombreInst })
-      .catch(err => console.warn('[Email]', err.message))
 
     showConfirmEliminar.value = false
     instSeleccionada.value = null
     await instCtrl.cargar()
   } catch (e) { actionError.value = e.message || 'Error al eliminar la institución' }
+}
+
+async function handleEliminarMiembro() {
+  actionError.value = ''
+  try {
+    await InstitucionRepository.removeMiembro(instSeleccionada.value.id_institucion, memberAEliminar.value.id_usuario)
+
+    showConfirmEliminarMiembro.value = false
+    memberAEliminar.value = null
+    await instCtrl.cargar()
+    const instActualizada = instituciones.value.find(i => i.id_institucion === instSeleccionada.value.id_institucion)
+    if (instActualizada) instSeleccionada.value = instActualizada
+  } catch (e) { actionError.value = e.message || 'Error al eliminar al miembro' }
 }
 
 function copiarId(id) {

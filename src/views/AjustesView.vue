@@ -78,13 +78,47 @@
       </div>
 
       <!-- rol del usuario -->
-      <div class="card" style="padding:1.5rem">
+      <div class="card" style="padding:1.5rem;margin-bottom:1.5rem">
         <h2 style="margin:0 0 1rem;font-size:1.1rem;font-weight:700">Información de cuenta</h2>
         <div style="display:flex;align-items:center;justify-content:space-between">
           <span style="color:var(--color-text-secondary);font-size:0.9rem">Tipo de cuenta</span>
           <span :class="authStore.isAdmin ? 'badge badge-success' : 'badge badge-warning'">
             {{ authStore.isAdmin ? 'Administrador' : 'Usuario Registrado' }}
           </span>
+        </div>
+      </div>
+
+      <!-- zona de peligro -->
+      <div class="card" style="padding:2rem">
+        <h2 style="margin:0 0 0.5rem;font-size:1.1rem;font-weight:700">Eliminar cuenta</h2>
+        <p style="color:var(--color-text-secondary);font-size:0.9rem;margin:0 0 1.5rem">Elimina permanentemente tu cuenta y todos tus datos. Esta acción no se puede deshacer.</p>
+        <button class="btn btn-danger" style="display:flex;align-items:center;gap:0.5rem" @click="confirmarEliminarCuenta">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          Eliminar mi cuenta
+        </button>
+      </div>
+    </div>
+
+    <!-- confirmar eliminar cuenta -->
+    <div v-if="showConfirmDelete" class="modal-overlay" @click.self="showConfirmDelete = false">
+      <div class="modal-box card" style="max-width:420px;width:90%;padding:2rem">
+        <div style="text-align:center;margin-bottom:1.5rem">
+          <div style="width:56px;height:56px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          </div>
+          <h2 style="margin:0 0 0.75rem;font-size:1.1rem;font-weight:700">¿Eliminar tu cuenta?</h2>
+          <p style="color:var(--color-text-secondary);font-size:0.9rem;margin:0">
+            Se eliminarán tu perfil, tus partituras y todos tus datos asociados.
+            Esta acción <strong>no se puede deshacer</strong>.
+          </p>
+        </div>
+        <div v-if="deleteError" class="alert alert-error" style="margin-bottom:1rem">{{ deleteError }}</div>
+        <div style="display:flex;gap:0.75rem;justify-content:center">
+          <button class="btn btn-secondary" @click="showConfirmDelete = false">Cancelar</button>
+          <button class="btn btn-danger" @click="handleEliminarCuenta" :disabled="deletingAccount">
+            <span v-if="deletingAccount" class="spinner spinner-sm"/>
+            Sí, eliminar
+          </button>
         </div>
       </div>
     </div>
@@ -95,18 +129,21 @@
 
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import AppHeader from '../components/AppHeader.vue'
 import AuthModal from '../components/AuthModal.vue'
 import { useAuthStore } from '../stores/authStore.js'
 import SupabaseClient from '../repositories/SupabaseClient.js'
 
 const authStore = useAuthStore()
+const router = useRouter()
 const showAuth = ref(false)
 
 const form = reactive({ nombre: '', apellidos: '', nickname: '' })
 const perfilSuccess = ref(''); const perfilError = ref(''); const savingPerfil = ref(false)
 const passSuccess = ref(''); const passError = ref(''); const savingPass = ref(false)
 const savingAvatar = ref(false)
+const showConfirmDelete = ref(false); const deleteError = ref(''); const deletingAccount = ref(false)
 
 const avatarSeed = computed(() => authStore.user?.avatar_seed || '')
 const diasRestantes = computed(() => {
@@ -162,10 +199,7 @@ async function handleSavePerfil() {
     
     if (error) throw error
 
-    perfilSuccess.value = 'Perfil actualizado correctamente. (Se ha simulado el envío de un email de confirmación).'
-
-    //Envío de correo electrónico de confirmación
-    alert(`SIMULACIÓN DE EMAIL:\n\nPara: ${authStore.user.email}\nAsunto: Han actualizado tus datos de perfil de Frig.io\n\nHola ${form.nombre},\n\nTe informamos que tus datos de perfil han sido actualizados satisfactoriamente.\n\nAtentamente,\nEl Equipo de Frig.io`)
+    perfilSuccess.value = 'Perfil actualizado correctamente.'
 
     //Actualizar store local
     if (authStore.user) {
@@ -190,4 +224,29 @@ async function handleResetPassword() {
     passSuccess.value = 'Se ha enviado un enlace seguro para restablecer tu contraseña a tu correo electrónico.'
   } catch (e) { passError.value = e.message } finally { savingPass.value = false }
 }
+
+function confirmarEliminarCuenta() { deleteError.value = ''; showConfirmDelete.value = true }
+
+async function handleEliminarCuenta() {
+  deleteError.value = ''
+  deletingAccount.value = true
+  try {
+    await authStore.deleteAccount()
+    router.push('/')
+  } catch (e) {
+    deleteError.value = e.message || 'Error al eliminar la cuenta'
+  } finally {
+    deletingAccount.value = false
+  }
+}
 </script>
+
+<style scoped>
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px); display: flex; align-items: center;
+  justify-content: center; z-index: 1000;
+}
+.modal-box { animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+</style>

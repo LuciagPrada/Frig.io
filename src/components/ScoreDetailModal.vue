@@ -177,9 +177,11 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
+import DOMPurify from 'dompurify'
 import { useAuthStore } from '../stores/authStore.js'
 import PartituraRepository from '../repositories/PartituraRepository.js'
 import { formatDate } from '../utils/validators.js'
+import { getVerovioToolkit } from '../utils/verovioLoader.js'
 import ComentariosSection from './ComentariosSection.vue'
 
   const props = defineProps({
@@ -216,24 +218,10 @@ import ComentariosSection from './ComentariosSection.vue'
     genero: props.partitura.genero
   })
   
-  const likesCount = computed(() => {
-    let base = 0
-    const l = props.partitura.likes
-    if (l) {
-      if (Array.isArray(l)) base = l[0]?.count ?? l.length
-      else base = Number(l) || 0
-    }
-    // Visually bump logic: if the user likes the score here but the prop doesn't know yet
-    return base
-  })
-
-  const comentariosCount = computed(() => {
-    if (props.partitura.total_comentarios !== undefined) return props.partitura.total_comentarios
-    const c = props.partitura.comentarios
-    if (!c) return 0
-    if (Array.isArray(c)) return c[0]?.count ?? c.length
-    return Number(c) || 0
-  })
+  //Supabase siempre devuelve los conteos embebidos (`likes(count)`) como
+  //[{ count: N }]; `total_comentarios` es una columna calculada (ya es un número).
+  const likesCount = computed(() => props.partitura.likes?.[0]?.count ?? 0)
+  const comentariosCount = computed(() => props.partitura.total_comentarios ?? 0)
 
   async function handleDescargarPDF() {
     try {
@@ -243,21 +231,22 @@ import ComentariosSection from './ComentariosSection.vue'
         document.head.appendChild(s)
         await new Promise(r => s.onload = r)
       }
-      if (!window.verovio) {
-        const s2 = document.createElement('script')
-        s2.src = 'https://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js'
-        document.head.appendChild(s2)
-        await new Promise(r => s2.onload = r)
-        await new Promise(r => setTimeout(r, 1000))
-      }
-
-      const tk = new window.verovio.toolkit()
+      const tk = await getVerovioToolkit()
       tk.setOptions({ scale: 40, pageWidth: 2000, adjustPageHeight: true, breaks: 'auto' })
       const musicxml = props.partitura.transcripciones?.[0]?.contenido_resultado
       if (!musicxml) return alert('No hay transcripción disponible para generar el PDF.')
-      
+
       tk.loadData(musicxml)
-      const svg = tk.renderToSVG(1)
+      //Igual que en VerovioViewer: el SVG viene de contenido subido por
+      //usuarios, se sanea antes de inyectarlo en el DOM.
+      //Ver VerovioViewer.vue: el perfil svg de DOMPurify excluye <use> por
+      //defecto y elimina xlink:href/href; Verovio los usa para las cabezas
+      //de nota con referencias internas (#id), no URLs de usuario.
+      const svg = DOMPurify.sanitize(tk.renderToSVG(1), {
+        USE_PROFILES: { svg: true, svgFilters: true },
+        ADD_TAGS: ['use'],
+        ADD_ATTR: ['xlink:href', 'href'],
+      })
       const hiddenDiv = document.createElement('div')
       hiddenDiv.innerHTML = svg
       document.body.appendChild(hiddenDiv)
