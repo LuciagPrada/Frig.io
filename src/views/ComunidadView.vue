@@ -98,7 +98,7 @@ import { useAuthStore } from '../stores/authStore.js'
 import { useComunidadController } from '../controllers/ComunidadController.js'
 
 const authStore = useAuthStore()
-const comunidadCtrl = useComunidadController(authStore.user?.id)
+const comunidadCtrl = useComunidadController()
 const { partituras, loading, getFeed, loadUserLikes, toggleLike } = comunidadCtrl
 
 const searchQuery = ref('')

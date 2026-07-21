@@ -43,6 +43,8 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
+import DOMPurify from 'dompurify'
+import { getVerovioToolkit } from '../utils/verovioLoader.js'
 
 const props = defineProps({
   musicxml: { type: String, required: true },
@@ -58,25 +60,35 @@ const isReady = ref(false)
 let midiPlayer = null
 let soundfontPiano = null
 let audioCtx = null
+const loadedScripts = []
 
 onMounted(async () => {
   try {
-    if (!window.verovio) {
-      await loadScript('https://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js')
-      await new Promise(r => setTimeout(r, 1000)) 
-    }
-    const tk = new window.verovio.toolkit()
+    const tk = await getVerovioToolkit()
     tk.setOptions({ scale: 40, pageWidth: 2000, adjustPageHeight: true, breaks: 'auto' })
     tk.loadData(props.musicxml)
-    svgContent.value = tk.renderToSVG(1)
-    
+    //El SVG lo genera Verovio a partir de contenido subido por usuarios: se
+    //sanea antes de inyectarlo en el DOM por si el propio MusicXML trae algo malicioso.
+    //Verovio dibuja las cabezas de nota reutilizando glifos con
+    //<use xlink:href="#glifo">, pero el perfil svg de DOMPurify excluye la
+    //etiqueta <use> por defecto (vector conocido de mutation-XSS) y también
+    //elimina xlink:href/href. Aquí el href siempre es una referencia interna
+    //(#id) generada por el propio Verovio, nunca una URL controlada por el
+    //usuario, y DOMPurify sigue validando el valor de la URI igualmente
+    //(bloquea javascript:/data:/externas), así que es seguro reactivarla.
+    svgContent.value = DOMPurify.sanitize(tk.renderToSVG(1), {
+      USE_PROFILES: { svg: true, svgFilters: true },
+      ADD_TAGS: ['use'],
+      ADD_ATTR: ['xlink:href', 'href'],
+    })
+
     // Initialize MIDI logic softly
     const base64midi = tk.renderToMIDI()
     window.generatedMidi = base64midi
 
     if (!window.MidiPlayer) await loadScript('https://cdn.jsdelivr.net/npm/midi-player-js@2.0.16/browser/midiplayer.min.js')
     if (!window.Soundfont) await loadScript('https://cdn.jsdelivr.net/npm/soundfont-player@0.12.0/dist/soundfont-player.min.js')
-    
+
     isReady.value = true
   } catch (e) {
     error.value = 'Error al renderizar: ' + e.message
@@ -91,6 +103,10 @@ onBeforeUnmount(() => {
     audioCtx.close()
     audioCtx = null
   }
+  //Limpiar las etiquetas <script> que hemos añadido nosotros para no
+  //acumular duplicados cada vez que se abre el visor.
+  for (const s of loadedScripts) s.remove()
+  loadedScripts.length = 0
 })
 
 async function initAudio() {
@@ -138,6 +154,7 @@ function loadScript(src) {
     const s = document.createElement('script')
     s.src = src; s.onload = resolve; s.onerror = reject
     document.head.appendChild(s)
+    loadedScripts.push(s)
   })
 }
 </script>

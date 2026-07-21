@@ -221,7 +221,7 @@ const unirseError = ref('')
 
 const instFiltro = ref(null) //Filtro de subtab de institución activa
 
-const ctrl = usePartituraController(authStore.user?.id)
+const ctrl = usePartituraController()
 const instCtrl = useInstitucionController()
 const { instituciones } = instCtrl
 
@@ -304,19 +304,13 @@ async function handleCompartir(p, tipo) {
       return
     }
     const instId = instFiltro.value || instCtrl.instituciones.value[0].id_institucion
-    await import('../repositories/PartituraRepository.js').then(m =>
-      m.default.updateMetadatos(p.id_partitura, { es_publica: false, es_privada: false, es_institucional: true, id_institucion: instId })
-    )
+    await ctrl.actualizarMetadatos(p.id_partitura, { es_publica: false, es_privada: false, es_institucional: true, id_institucion: instId })
     alert('La partitura ha sido movida a tu institución.')
   } else if (tipo === 'comunidad') {
-    await import('../repositories/PartituraRepository.js').then(m =>
-      m.default.updateMetadatos(p.id_partitura, { es_publica: true, es_privada: false, es_institucional: false })
-    )
+    await ctrl.actualizarMetadatos(p.id_partitura, { es_publica: true, es_privada: false, es_institucional: false })
     alert('La partitura se ha publicado en la comunidad.')
   } else if (tipo === 'privada') {
-    await import('../repositories/PartituraRepository.js').then(m =>
-      m.default.updateMetadatos(p.id_partitura, { es_publica: false, es_privada: true, es_institucional: false, id_institucion: null })
-    )
+    await ctrl.actualizarMetadatos(p.id_partitura, { es_publica: false, es_privada: true, es_institucional: false, id_institucion: null })
     alert('La partitura vuelve a ser totalmente privada.')
   }
   await loadPartituras()

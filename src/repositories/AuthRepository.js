@@ -3,6 +3,17 @@ import SupabaseClient from './SupabaseClient.js'
 
 const auth = SupabaseClient.getInstance().getAuth()
 
+//Espera (con reintentos cortos) a que el trigger handle_new_user haya
+//creado la fila en public.usuarios, en vez de una espera fija arbitraria.
+async function waitForUsuarioRow(db, uid, attempts = 6, delayMs = 300) {
+  for (let i = 0; i < attempts; i++) {
+    const { data } = await db.from('usuarios').select('id').eq('id', uid).maybeSingle()
+    if (data) return true
+    await new Promise(r => setTimeout(r, delayMs))
+  }
+  return false
+}
+
 const AuthRepository = {
   async login(email, pass) {
     const { data, error } = await auth.signInWithPassword({ email, password: pass })
@@ -31,13 +42,19 @@ const AuthRepository = {
       try {
         const db = SupabaseClient.getInstance().getDB()
         const initialSeed = Math.random().toString(36).substring(2, 10)
-        //Esperamos a que el trigger haya ejecutado
-        await new Promise(r => setTimeout(r, 800))
-        await db
-          .from('usuarios')
-          .update({ avatar_seed: initialSeed })
-          .eq('id', data.user.id)
-      } catch (_) { }
+        const exists = await waitForUsuarioRow(db, data.user.id)
+        if (!exists) {
+          console.error('[AuthRepository] La fila de usuarios no se creó a tiempo; no se asignó avatar inicial.')
+        } else {
+          const { error: seedError } = await db
+            .from('usuarios')
+            .update({ avatar_seed: initialSeed })
+            .eq('id', data.user.id)
+          if (seedError) console.error('[AuthRepository] No se pudo asignar avatar inicial:', seedError)
+        }
+      } catch (e) {
+        console.error('[AuthRepository] Error asignando avatar inicial:', e)
+      }
     }
 
     return data
@@ -45,6 +62,12 @@ const AuthRepository = {
 
   async logout() {
     const { error } = await auth.signOut()
+    if (error) throw error
+  },
+
+  async deleteAccount() {
+    const db = SupabaseClient.getInstance().getDB()
+    const { error } = await db.rpc('eliminar_cuenta')
     if (error) throw error
   },
 

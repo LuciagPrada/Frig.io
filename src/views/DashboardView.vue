@@ -97,7 +97,7 @@ const showAuth = ref(false)
 const showMetadataForm = ref(false)
 const aiResult = ref(null)
 
-const controller = usePartituraController(authStore.user?.id)
+const controller = usePartituraController()
 
 async function handleTranscribir() {
   if (!selectedFile.value) return
@@ -135,7 +135,9 @@ async function handleSaveFinal(metadatosEditados) {
     selectedFile.value = null
   } catch (e) {
     // El error ahora se pasa al modal para que el usuario lo vea.
-    transcriptionError.value = e.message || JSON.stringify(e) || 'Error al guardar la partitura.'
+    // (No se usa JSON.stringify(e): podría filtrar detalles internos/stack al usuario.)
+    console.error('[Dashboard] Error al guardar la partitura:', e)
+    transcriptionError.value = e.message || 'Error al guardar la partitura.'
   } finally {
     saving.value = false
   }

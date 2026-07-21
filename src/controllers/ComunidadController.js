@@ -1,11 +1,16 @@
 //ComunidadController:feed público, búsqueda, likes
 import { ref } from 'vue'
 import PartituraRepository from '../repositories/PartituraRepository.js'
+import { useAuthStore } from '../stores/authStore.js'
 
-export function useComunidadController(userId) {
+export function useComunidadController() {
   const partituras = ref([])
   const loading = ref(false)
   const userLikes = ref(new Set())
+
+  function getUserId() {
+    return useAuthStore().user?.id
+  }
 
   async function getFeed(query = '') {
     loading.value = true
@@ -18,12 +23,14 @@ export function useComunidadController(userId) {
   }
 
   async function loadUserLikes() {
+    const userId = getUserId()
     if (!userId) return
     const likes = await PartituraRepository.getLikesByUser(userId)
     userLikes.value = new Set(likes)
   }
 
   async function toggleLike(partituraId) {
+    const userId = getUserId()
     if (!userId) return
     const liked = await PartituraRepository.toggleLike(partituraId, userId)
     if (liked) {

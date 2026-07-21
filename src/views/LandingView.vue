@@ -141,7 +141,7 @@ const showProjectPopup = ref(false)
 const authStore = useAuthStore()
 
 onMounted(() => {
-  if (route.query.login) { showAuth.value = true; authTab.value = 'login' }
+  if (route.query.login === '1') { showAuth.value = true; authTab.value = 'login' }
 })
 
 function openAuth(tab = 'login') {

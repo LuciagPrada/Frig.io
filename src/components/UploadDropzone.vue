@@ -54,13 +54,17 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { validateImageFile } from '../utils/validators.js'
 
 const emit = defineEmits(['update:file'])
-const props = defineProps({ modelValue: { default: null } })
+const props = defineProps({ file: { default: null } })
 
-const file = ref(null)
+const file = ref(props.file)
+
+//Si el padre resetea el archivo desde fuera (p.ej. tras guardar la
+//partitura), reflejarlo aquí para que el dropzone vuelva a su estado vacío.
+watch(() => props.file, (v) => { file.value = v })
 const isDragging = ref(false)
 const validationError = ref('')
 const inputRef = ref(null)
