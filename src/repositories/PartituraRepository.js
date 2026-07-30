@@ -87,6 +87,24 @@ const PartituraRepository = {
     return data
   },
 
+  //Carga una partitura concreta con los mismos joins que el detalle de comunidad
+  //pero sin filtrar por es_publica: sirve también para partituras propias,
+  //privadas o institucionales (la RLS de partituras_select_public ya decide
+  //quién puede verla).
+  async getPartituraById(partituraId) {
+    const db = getDB()
+    const { data, error } = await db
+      .from('partituras')
+      .select('*, transcripciones(*), usuarios!partituras_id_propietario_fkey(nickname, nombre, avatar_url, avatar_seed), likes(count), total_comentarios')
+      .eq('id_partitura', partituraId)
+      .single()
+    if (error) {
+      console.error('Error getPartituraById:', error)
+      throw error
+    }
+    return data
+  },
+
   async toggleLike(partituraId, userId) {
     const db = getDB()
     const { data: existing } = await db
@@ -116,29 +134,6 @@ const PartituraRepository = {
     const { data, error } = await db.from('likes').select('id_partitura').eq('id_usuario', userId)
     if (error) throw error
     return (data || []).map(l => l.id_partitura)
-  },
-
-  async getLikedPartituras(userId) {
-    const db = getDB()
-    const { data, error } = await db
-      .from('likes')
-      .select(`
-        id_partitura,
-        partituras (
-          *,
-          transcripciones(*),
-          likes(count),
-          total_comentarios,
-          usuarios!partituras_id_propietario_fkey(nickname, nombre, avatar_url, avatar_seed)
-        )
-      `)
-      .eq('id_usuario', userId)
-    if (error) {
-      console.error('Error getLikedPartituras:', error)
-      return []
-    }
-    const partituras = (data || []).map(l => l.partituras).filter(p => p && p.id_propietario !== userId)
-    return partituras.sort((a, b) => new Date(b.fecha_subida || 0) - new Date(a.fecha_subida || 0))
   },
 
   async uploadImage(file, path) {

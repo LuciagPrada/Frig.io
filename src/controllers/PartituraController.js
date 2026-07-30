@@ -70,6 +70,8 @@ export function usePartituraController() {
         ano_original: metadatosEditados.ano_original || null,
         fecha_subida: new Date().toISOString(),
         es_publica: false,
+        //Solo se llega hasta aquí si el usuario marcó la casilla de copyright.
+        copyright_confirmado: true,
       })
 
       // 2.3. Guardar en tabla 'transcripciones'
@@ -102,9 +104,5 @@ export function usePartituraController() {
     return PartituraRepository.updateMetadatos(id, datos)
   }
 
-  async function obtenerFavoritos() {
-    return PartituraRepository.getLikedPartituras(getUserId())
-  }
-
-  return { loading, error, transcribirImagen, guardarPartituraFinal, obtenerBiblioteca, obtenerFavoritos, eliminar, actualizarMetadatos }
+  return { loading, error, transcribirImagen, guardarPartituraFinal, obtenerBiblioteca, eliminar, actualizarMetadatos }
 }

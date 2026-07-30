@@ -35,11 +35,23 @@
           </div>
         </div>
 
+        <!-- aviso de copyright + confirmación obligatoria -->
+        <div class="copyright-box">
+          <p class="copyright-text">
+            Frigio no se hace responsable de las partituras publicadas y subidas. Todas las partituras
+            subidas y transcritas deben estar libres de copyright.
+          </p>
+          <label class="copyright-check">
+            <input v-model="copyrightConfirmado" type="checkbox"/>
+            <span>Confirmo que esta partitura está libre de copyright</span>
+          </label>
+        </div>
+
         <!-- botón transcribir -->
         <button
           class="btn btn-teal btn-full"
           style="margin-top:1.25rem;font-size:1rem;padding:0.9rem;border-radius:var(--radius-sm)"
-          :disabled="!selectedFile || loading"
+          :disabled="!selectedFile || loading || !copyrightConfirmado"
           @click="handleTranscribir"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0">
@@ -93,6 +105,8 @@ const statusMsg = ref('')
 const transcriptionError = ref('')
 const lastResult = ref(null)
 const showAuth = ref(false)
+//Sin esta confirmación no se permite lanzar la transcripción
+const copyrightConfirmado = ref(false)
 
 const showMetadataForm = ref(false)
 const aiResult = ref(null)
@@ -149,3 +163,27 @@ const features = [
   { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>', title: 'Compartir en Comunidad', desc: 'Comparte tus partituras con la comunidad y descubre las de otros usuarios.' },
 ]
 </script>
+
+<style scoped>
+.copyright-box {
+  margin-top: 1.25rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+.copyright-text {
+  margin: 0 0 0.6rem;
+  font-size: 0.82rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+.copyright-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+</style>

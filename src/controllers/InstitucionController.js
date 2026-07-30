@@ -1,6 +1,7 @@
 //InstitucionController: gestión de múltiples instituciones por usuario ¡
 import { ref } from 'vue'
 import InstitucionRepository from '../repositories/InstitucionRepository.js'
+import SolicitudInstitucionRepository from '../repositories/SolicitudInstitucionRepository.js'
 import PartituraRepository from '../repositories/PartituraRepository.js'
 import { useAuthStore } from '../stores/authStore.js'
 
@@ -48,15 +49,18 @@ export function useInstitucionController() {
     }
   }
 
-  //Une al usuario actual como miembro de una institución existente por ID
+  //Solicita el ingreso a una institución existente por ID. Ya no se entra
+  //directamente: la RLS solo deja insertar en miembros_institucion al
+  //administrador, así que se crea una solicitud que él debe aprobar. No se
+  //recarga la lista de instituciones porque el usuario todavía no es miembro.
   async function unirse(instId) {
     loading.value = true
     error.value = null
     try {
       const uid = getUserId()
       if (!uid) throw new Error('No hay usuario autenticado')
-      await InstitucionRepository.addMiembro(instId, uid)
-      await cargar()
+      await SolicitudInstitucionRepository.crear(instId, uid)
+      return true
     } catch (e) {
       error.value = e.message
       throw e

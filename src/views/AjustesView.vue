@@ -77,17 +77,6 @@
         </button>
       </div>
 
-      <!-- rol del usuario -->
-      <div class="card" style="padding:1.5rem;margin-bottom:1.5rem">
-        <h2 style="margin:0 0 1rem;font-size:1.1rem;font-weight:700">Información de cuenta</h2>
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <span style="color:var(--color-text-secondary);font-size:0.9rem">Tipo de cuenta</span>
-          <span :class="authStore.isAdmin ? 'badge badge-success' : 'badge badge-warning'">
-            {{ authStore.isAdmin ? 'Administrador' : 'Usuario Registrado' }}
-          </span>
-        </div>
-      </div>
-
       <!-- zona de peligro -->
       <div class="card" style="padding:2rem">
         <h2 style="margin:0 0 0.5rem;font-size:1.1rem;font-weight:700">Eliminar cuenta</h2>
