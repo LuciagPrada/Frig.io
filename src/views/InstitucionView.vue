@@ -2,7 +2,67 @@
   <div>
     <AppHeader @open-auth="showAuth = true"/>
 
-    <div class="page-container" style="max-width:860px">
+    <!-- ====== BIBLIOTECA DE UNA INSTITUCIÓN ====== -->
+    <div v-if="instAbierta" class="page-container">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap">
+        <div>
+          <button class="btn btn-secondary" style="margin-bottom:0.75rem" @click="cerrarBiblioteca">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            Mis instituciones
+          </button>
+          <h1 class="page-title" style="display:flex;align-items:center;gap:0.75rem;margin:0 0 0.4rem">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="4" y="10" width="4" height="10"/><rect x="10" y="10" width="4" height="10"/>
+              <rect x="16" y="10" width="4" height="10"/><path d="M2 22h20"/><path d="M12 2L2 8h20L12 2z"/>
+            </svg>
+            {{ instAbierta.nombre }}
+          </h1>
+          <p class="page-subtitle" style="margin:0">Partituras compartidas con esta institución</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.75rem;flex-shrink:0">
+          <!-- filtros por etiqueta propia / instrumento / género / me gusta -->
+          <ScoreFilterMenu
+            v-if="!loadingBiblioteca && partiturasInst.length"
+            :partituras="partiturasInst"
+            :liked-ids="likedIds"
+            :mis-etiquetas="misEtiquetas"
+            @filtered="partiturasFiltradas = $event"
+          />
+          <button class="btn btn-primary" style="display:flex;align-items:center;gap:0.5rem" @click="abrirAjustes">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            Ajustes
+          </button>
+        </div>
+      </div>
+
+      <div v-if="loadingBiblioteca" style="display:flex;justify-content:center;padding:3rem">
+        <div class="spinner"/>
+      </div>
+
+      <div v-else-if="partiturasFiltradas.length" class="score-grid">
+        <ScoreCard
+          v-for="p in partiturasFiltradas"
+          :key="p.id_partitura"
+          :partitura="p"
+          @click="abrirDetalle(p)"
+        />
+      </div>
+
+      <div v-else style="text-align:center;padding:4rem 2rem">
+        <div style="margin-bottom:1rem;color:var(--color-text-secondary)">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        </div>
+        <h3 style="font-weight:700;margin:0 0 0.5rem">
+          {{ partiturasInst.length ? 'Ninguna partitura coincide con el filtro' : 'Esta institución no tiene partituras compartidas aún' }}
+        </h3>
+        <p style="color:var(--color-text-secondary);margin:0">
+          {{ partiturasInst.length ? 'Prueba con otros filtros o límpialos' : 'Comparte una partitura desde su ficha para que aparezca aquí' }}
+        </p>
+      </div>
+    </div>
+
+    <!-- ====== SELECTOR DE INSTITUCIONES ====== -->
+    <div v-else class="page-container" style="max-width:860px">
       <!-- cabecera -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem">
         <div>
@@ -68,7 +128,7 @@
           v-for="inst in instituciones"
           :key="inst.id_institucion"
           class="inst-card"
-          @click="openGestionar(inst)"
+          @click="abrirBiblioteca(inst)"
         >
           <div class="inst-card-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -130,23 +190,38 @@
           <h2 class="modal-title">Unirme a institución</h2>
           <button class="btn-icon" @click="showUnirse = false"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
         </div>
-        <p style="color:var(--color-text-secondary);font-size:0.9rem;margin:0 0 1.5rem">
-          Introduce el ID de la institución que te ha proporcionado el administrador.
-        </p>
-        <form @submit.prevent="handleUnirse">
-          <div class="form-group">
-            <label class="form-label">ID de la institución *</label>
-            <input v-model="instIdUnirse" type="text" class="form-input" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" required/>
+        <!-- Confirmación: la solicitud queda pendiente hasta que el admin la apruebe -->
+        <template v-if="unirseEnviada">
+          <div class="alert alert-success" style="margin-bottom:1.5rem">
+            Solicitud enviada. El administrador debe aprobarla antes de que tengas acceso
+            a la institución y a su biblioteca.
           </div>
-          <div v-if="unirseError" class="alert alert-error" style="margin-bottom:1rem">{{ unirseError }}</div>
-          <div style="display:flex;gap:0.75rem;justify-content:flex-end">
-            <button type="button" class="btn btn-secondary" @click="showUnirse = false">Cancelar</button>
-            <button type="submit" class="btn btn-primary" :disabled="instCtrl.loading.value">
-              <span v-if="instCtrl.loading.value" class="spinner spinner-sm"/>
-              Unirme
-            </button>
+          <div style="display:flex;justify-content:flex-end">
+            <button type="button" class="btn btn-primary" @click="showUnirse = false">Entendido</button>
           </div>
-        </form>
+        </template>
+
+        <template v-else>
+          <p style="color:var(--color-text-secondary);font-size:0.9rem;margin:0 0 1.5rem">
+            Introduce el ID de la institución que te ha proporcionado el administrador.
+            Se enviará una solicitud al administrador, que debe aprobarla antes de que
+            tengas acceso.
+          </p>
+          <form @submit.prevent="handleUnirse">
+            <div class="form-group">
+              <label class="form-label">ID de la institución *</label>
+              <input v-model="instIdUnirse" type="text" class="form-input" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" required/>
+            </div>
+            <div v-if="unirseError" class="alert alert-error" style="margin-bottom:1rem">{{ unirseError }}</div>
+            <div style="display:flex;gap:0.75rem;justify-content:flex-end">
+              <button type="button" class="btn btn-secondary" @click="showUnirse = false">Cancelar</button>
+              <button type="submit" class="btn btn-primary" :disabled="instCtrl.loading.value">
+                <span v-if="instCtrl.loading.value" class="spinner spinner-sm"/>
+                Enviar solicitud
+              </button>
+            </div>
+          </form>
+        </template>
       </div>
     </div>
 
@@ -164,8 +239,8 @@
         </div>
 
         <div style="padding:1.5rem 2rem">
-          <!-- ID para compartir con miembros (solo para el admin) -->
-          <div v-if="instSeleccionada.rolUsuario === 'ADMINISTRADOR'" class="alert alert-info" style="margin-bottom:1.5rem">
+          <!-- ID para compartir con miembros (visible para cualquier miembro) -->
+          <div class="alert alert-info" style="margin-bottom:1.5rem">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-teal-dark)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
             <div style="flex:1;min-width:0">
               <p style="margin:0 0 0.2rem;font-size:0.8rem;font-weight:600">ID para compartir con miembros:</p>
@@ -197,9 +272,11 @@
                 <tr v-for="m in (instSeleccionada.miembros_institucion || [])" :key="m.id_usuario" style="border-top:1px solid var(--color-border)">
                   <td style="padding:0.75rem 1.25rem;font-weight:500">{{ m.usuarios?.nombre }} {{ m.usuarios?.apellidos }}</td>
                   <td style="padding:0.75rem 1.25rem;color:var(--color-text-secondary);font-size:0.85rem">{{ m.usuarios?.email }}</td>
+                  <!-- El rol aquí es el rol DENTRO de esta institución (quién la
+                       administra), no el rol global del usuario en la aplicación. -->
                   <td style="padding:0.75rem 1.25rem">
-                    <span :class="m.usuarios?.rol === 'ADMINISTRADOR' ? 'badge badge-success' : 'badge badge-warning'">
-                      {{ m.usuarios?.rol === 'ADMINISTRADOR' ? 'Admin' : 'Miembro' }}
+                    <span :class="esAdminDeLaInstitucion(m) ? 'badge badge-success' : 'badge badge-warning'">
+                      {{ esAdminDeLaInstitucion(m) ? 'Admin' : 'Miembro' }}
                     </span>
                   </td>
                   <td v-if="instSeleccionada.rolUsuario === 'ADMINISTRADOR'" style="padding:0.75rem 1.25rem;text-align:right">
@@ -318,15 +395,29 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import AppHeader from '../components/AppHeader.vue'
 import AuthModal from '../components/AuthModal.vue'
+import ScoreCard from '../components/ScoreCard.vue'
+import ScoreFilterMenu from '../components/ScoreFilterMenu.vue'
 import { useAuthStore } from '../stores/authStore.js'
 import { useInstitucionController } from '../controllers/InstitucionController.js'
 import InstitucionRepository from '../repositories/InstitucionRepository.js'
+import PartituraRepository from '../repositories/PartituraRepository.js'
+import EtiquetaRepository from '../repositories/EtiquetaRepository.js'
 
+const router = useRouter()
 const authStore = useAuthStore()
 const instCtrl = useInstitucionController()
 const { instituciones, loading } = instCtrl
+
+//Biblioteca de la institución abierta (estado local, sin sub-rutas)
+const instAbierta = ref(null)
+const partiturasInst = ref([])
+const partiturasFiltradas = ref([])
+const likedIds = ref([])
+const misEtiquetas = ref([])
+const loadingBiblioteca = ref(false)
 
 const showAuth = ref(false)
 const showMenu = ref(false)
@@ -343,6 +434,7 @@ const descNueva = ref('')
 const crearError = ref('')
 const instIdUnirse = ref('')
 const unirseError = ref('')
+const unirseEnviada = ref(false)
 const emailInvitacion = ref('')
 const inviteError = ref('')
 const gestionSuccess = ref('')
@@ -352,9 +444,51 @@ onMounted(async () => { await instCtrl.cargar() })
 
 function toggleMenu() { showMenu.value = !showMenu.value }
 function openCrear()  { showMenu.value = false; crearError.value = ''; nombreNueva.value = ''; descNueva.value = ''; showCrear.value = true }
-function openUnirse() { showMenu.value = false; unirseError.value = ''; instIdUnirse.value = ''; showUnirse.value = true }
-function openGestionar(inst) { instSeleccionada.value = inst; inviteError.value = ''; gestionSuccess.value = ''; actionError.value = '' }
+function openUnirse() { showMenu.value = false; unirseError.value = ''; unirseEnviada.value = false; instIdUnirse.value = ''; showUnirse.value = true }
 function cerrarGestionar() { instSeleccionada.value = null }
+
+//Abrir la biblioteca de una institución al pulsar su tarjeta
+async function abrirBiblioteca(inst) {
+  instAbierta.value = inst
+  partiturasInst.value = []
+  partiturasFiltradas.value = []
+  loadingBiblioteca.value = true
+  try {
+    partiturasInst.value = await instCtrl.getBibliotecaInstitucion(inst.id_institucion)
+    partiturasFiltradas.value = partiturasInst.value
+    if (authStore.user?.id) {
+      //Likes y etiquetas privadas se cargan una sola vez al abrir la
+      //biblioteca; el panel de filtro trabaja después en cliente.
+      const [likes, etiquetas] = await Promise.all([
+        PartituraRepository.getLikesByUser(authStore.user.id),
+        EtiquetaRepository.getMisEtiquetas(authStore.user.id),
+      ])
+      likedIds.value = likes
+      misEtiquetas.value = etiquetas
+    }
+  } finally {
+    loadingBiblioteca.value = false
+  }
+}
+
+function cerrarBiblioteca() { instAbierta.value = null; partiturasInst.value = []; partiturasFiltradas.value = [] }
+
+//El panel de gestión ahora se abre desde el botón "Ajustes"
+function abrirAjustes() {
+  instSeleccionada.value = instAbierta.value
+  inviteError.value = ''
+  gestionSuccess.value = ''
+  actionError.value = ''
+}
+
+function abrirDetalle(p) { router.push('/partitura/' + p.id_partitura) }
+
+//Un miembro es "Admin" si es el administrador DE ESTA institución. Antes se
+//miraba m.usuarios.rol, que es el rol global del usuario en la aplicación
+//(casi siempre USUARIO_REGISTRADO) y no tenía nada que ver con la institución.
+function esAdminDeLaInstitucion(m) {
+  return !!instSeleccionada.value && m.id_usuario === instSeleccionada.value.id_administrador
+}
 
 async function handleCrear() {
   crearError.value = ''
@@ -364,12 +498,15 @@ async function handleCrear() {
   } catch (e) { crearError.value = e.message || 'Error al crear la institución' }
 }
 
+//Ya no se entra directamente: se envía una solicitud que el administrador
+//debe aprobar, así que el modal solo confirma que quedó pendiente (no se abre
+//la biblioteca de una institución a la que todavía no se pertenece).
 async function handleUnirse() {
   unirseError.value = ''
   try {
     await instCtrl.unirse(instIdUnirse.value.trim())
-    showUnirse.value = false
-  } catch (e) { unirseError.value = e.message || 'No se pudo unir. Verifica el ID.' }
+    unirseEnviada.value = true
+  } catch (e) { unirseError.value = e.message || 'No se pudo enviar la solicitud. Verifica el ID.' }
 }
 
 async function handleInvitar() {
@@ -396,6 +533,7 @@ async function handleSalir() {
 
     showConfirmSalir.value = false
     instSeleccionada.value = null
+    cerrarBiblioteca()
     await instCtrl.cargar()
   } catch (e) { actionError.value = e.message || 'Error al salir de la institución' }
 }
@@ -407,6 +545,7 @@ async function handleEliminar() {
 
     showConfirmEliminar.value = false
     instSeleccionada.value = null
+    cerrarBiblioteca()
     await instCtrl.cargar()
   } catch (e) { actionError.value = e.message || 'Error al eliminar la institución' }
 }

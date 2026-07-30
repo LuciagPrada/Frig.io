@@ -28,10 +28,16 @@ const routes = [
     meta: { public: true },
   },
   {
-    path: '/institucion',
-    name: 'Institucion',
+    path: '/mis-instituciones',
+    name: 'MisInstituciones',
     component: () => import('../views/InstitucionView.vue'),
     meta: { requiresAuth: true },
+  },
+  {
+    path: '/partitura/:id',
+    name: 'ScoreDetail',
+    component: () => import('../views/ScoreDetailView.vue'),
+    meta: { public: true },
   },
   {
     path: '/ajustes',

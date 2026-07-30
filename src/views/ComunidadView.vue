@@ -11,10 +11,20 @@
           </h1>
           <p class="page-subtitle">Descubre partituras compartidas por otros músicos y musicólogos</p>
         </div>
-        <router-link to="/dashboard" class="btn btn-primary" style="margin-bottom:1.5rem;display:flex;align-items:center;gap:0.5rem">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-          Añadir partitura
-        </router-link>
+        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1.5rem;flex-shrink:0">
+          <!-- filtros por etiqueta propia / instrumento / género / me gusta -->
+          <ScoreFilterMenu
+            v-if="!loading && partituras.length"
+            :partituras="partituras"
+            :liked-ids="likedIds"
+            :mis-etiquetas="misEtiquetas"
+            @filtered="partiturasFiltradas = $event"
+          />
+          <router-link to="/dashboard" class="btn btn-primary" style="display:flex;align-items:center;gap:0.5rem">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            Añadir partitura
+          </router-link>
+        </div>
       </div>
 
       <!-- barra de búsqueda -->
@@ -41,9 +51,9 @@
       </div>
 
       <!-- grid de resultados -->
-      <div v-else-if="partituras.length" class="score-grid">
+      <div v-else-if="partiturasFiltradas.length" class="score-grid">
         <ScoreCard
-          v-for="p in partituras"
+          v-for="p in partiturasFiltradas"
           :key="p.id_partitura"
           :partitura="p"
           :show-like="authStore.isAuthenticated"
@@ -67,49 +77,42 @@
       </div>
     </div>
 
-    <!-- modals -->
-    <ScoreDetailModal
-      v-if="selectedPartitura"
-      :partitura="selectedPartitura"
-      @close="selectedPartitura = null; getFeed()"
-      @reproducir="handleReproducir"
-      @descargar="handleDescargar"
-      @compartir="() => {}"
-      @eliminar="() => {}"
-      @request-login="showAuth = true"
-    />
-    <VerovioViewer
-      v-if="showVerovio && verovioXml"
-      :musicxml="verovioXml"
-      @close="showVerovio = false"
-    />
     <AuthModal v-if="showAuth" initial-tab="login" @close="showAuth = false"/>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import AppHeader from '../components/AppHeader.vue'
 import ScoreCard from '../components/ScoreCard.vue'
-import ScoreDetailModal from '../components/ScoreDetailModal.vue'
-import VerovioViewer from '../components/VerovioViewer.vue'
+import ScoreFilterMenu from '../components/ScoreFilterMenu.vue'
 import AuthModal from '../components/AuthModal.vue'
 import { useAuthStore } from '../stores/authStore.js'
 import { useComunidadController } from '../controllers/ComunidadController.js'
+import EtiquetaRepository from '../repositories/EtiquetaRepository.js'
 
+const router = useRouter()
 const authStore = useAuthStore()
 const comunidadCtrl = useComunidadController()
-const { partituras, loading, getFeed, loadUserLikes, toggleLike } = comunidadCtrl
+const { partituras, loading, userLikes, getFeed, loadUserLikes, toggleLike } = comunidadCtrl
 
 const searchQuery = ref('')
-const selectedPartitura = ref(null)
-const showVerovio = ref(false)
-const verovioXml = ref('')
 const showAuth = ref(false)
+const partiturasFiltradas = ref([])
+const misEtiquetas = ref([])
+
+//El filtro "Me gusta" reutiliza los likes que el controlador ya tiene cargados
+const likedIds = computed(() => [...userLikes.value])
 
 onMounted(async () => {
   await getFeed()
-  if (authStore.isAuthenticated) await loadUserLikes()
+  if (authStore.isAuthenticated) {
+    await loadUserLikes()
+    //Las etiquetas privadas del usuario se piden una sola vez y el panel de
+    //filtro las cruza en cliente con el feed.
+    misEtiquetas.value = await EtiquetaRepository.getMisEtiquetas(authStore.user?.id)
+  }
 })
 
 let searchTimeout = null
@@ -117,6 +120,10 @@ watch(searchQuery, (val) => {
   clearTimeout(searchTimeout)
   searchTimeout = setTimeout(() => getFeed(val), 400)
 })
+
+//Si una búsqueda deja el feed vacío, el panel de filtro se desmonta y ya no
+//emite: hay que vaciar la lista filtrada a mano para no dejar resultados viejos.
+watch(partituras, (v) => { if (!v.length) partiturasFiltradas.value = [] })
 
 function handleSearch() { getFeed(searchQuery.value) }
 function clearSearch() { searchQuery.value = ''; getFeed() }
@@ -126,19 +133,5 @@ async function handleLike(id) {
   await toggleLike(id)
 }
 
-function openDetail(p) { selectedPartitura.value = p }
-
-function handleReproducir(p) {
-  const xml = p.transcripciones?.[0]?.musicxml_content
-  if (xml) { verovioXml.value = xml; showVerovio.value = true }
-}
-
-function handleDescargar(p) {
-  const xml = p.transcripciones?.[0]?.musicxml_content || ''
-  const blob = new Blob([xml], { type: 'application/xml' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url; a.download = `${p.titulo || 'partitura'}.xml`; a.click()
-  URL.revokeObjectURL(url)
-}
+function openDetail(p) { router.push('/partitura/' + p.id_partitura) }
 </script>
