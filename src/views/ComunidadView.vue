@@ -22,7 +22,7 @@
           />
           <router-link to="/dashboard" class="btn btn-primary" style="display:flex;align-items:center;gap:0.5rem">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-            Añadir partitura
+            Nueva partitura
           </router-link>
         </div>
       </div>

@@ -59,7 +59,7 @@
               </button>
 
               <div v-if="etiquetandoActivo" class="dropdown etiquetar-panel">
-                <div class="etiquetar-head">Tus etiquetas</div>
+                <div class="etiquetar-head">Mis etiquetas</div>
                 <button
                   v-for="tag in todasMisEtiquetas"
                   :key="tag"
@@ -232,7 +232,7 @@
              No tiene nada que ver con el modo de edición de metadatos. -->
         <div class="card" style="padding:1.5rem;margin-bottom:1.5rem">
           <h3 style="margin:0 0 0.35rem;font-size:1rem;font-weight:700;color:var(--color-navy)">
-            Tus etiquetas
+            Mis etiquetas
           </h3>
           <p style="margin:0 0 1rem;font-size:0.82rem;color:var(--color-text-secondary)">
             Organiza esta partitura con tus propias etiquetas. Solo tú las ves y puedes
@@ -512,7 +512,7 @@ function abrirNuevaEtiqueta() {
 }
 
 //Marca/desmarca en esta partitura una etiqueta que el usuario ya había
-//creado antes. La lista de "Tus etiquetas" del panel no quita la etiqueta
+//creado antes. La lista de "Mis etiquetas" del panel no quita la etiqueta
 //al aplicarla: se queda ahí marcada (tick azul) para poder quitarla
 //volviendo a pulsarla.
 async function toggleEtiquetaExistente(tag) {
