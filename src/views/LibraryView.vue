@@ -8,7 +8,7 @@
         <div>
           <h1 class="page-title" style="display:flex;align-items:center;gap:0.75rem;margin:0 0 0.5rem">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
-            Tu biblioteca
+            Mi biblioteca
           </h1>
           <p class="page-subtitle" style="margin-bottom:0">
             Aquí se guardan las partituras que hayas escaneado para que puedas revisarlas cuando quieras
@@ -25,7 +25,7 @@
           />
           <router-link to="/dashboard" class="btn btn-primary" style="display:flex;align-items:center;gap:0.5rem">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-            Añadir partitura
+            Nueva partitura
           </router-link>
         </div>
       </div>

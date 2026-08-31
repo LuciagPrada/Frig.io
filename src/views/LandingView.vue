@@ -8,7 +8,7 @@
         <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
       </svg>
       <h1 style="font-size:2.5rem;font-weight:800;color:var(--color-navy);margin:0 0 1rem">
-        Transcripción de Partituras con OMR
+        Transcripción de partituras con OMR
       </h1>
       <p style="color:rgba(15,23,42,0.7);font-size:1.1rem;max-width:600px;margin:0 auto 2rem;line-height:1.6">
         Plataforma de reconocimiento óptico musical que convierte imágenes<br>
@@ -28,7 +28,7 @@
           Inicia sesión para subir tus partituras y acceder a todas las funciones
         </p>
         <button v-if="!authStore.isAuthenticated" class="btn btn-primary" style="font-size:1rem;padding:0.75rem 2rem" @click="openAuth('login')">
-          Iniciar Sesión para Comenzar
+          Inicia sesión para comenzar
         </button>
         <router-link v-else to="/dashboard" class="btn btn-primary" style="font-size:1rem;padding:0.75rem 2rem;text-decoration:none">
           Ir a Transcribir
@@ -82,14 +82,14 @@
           <div style="font-size:2rem;margin-bottom:0.75rem;color:var(--color-teal-dark)">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin:0 auto"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
           </div>
-          <h3 style="font-size:1rem;font-weight:700;margin:0 0 0.5rem">Biblioteca Personal</h3>
+          <h3 style="font-size:1rem;font-weight:700;margin:0 0 0.5rem">Biblioteca personal</h3>
           <p style="color:var(--color-text-secondary);font-size:0.85rem;margin:0;line-height:1.5">Guarda todas tus partituras transcritas en tu biblioteca personal y accede a ellas cuando quieras.</p>
         </div>
         <div class="card cursor-pointer hover-effect" style="padding:1.5rem;text-align:center;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s" @click="authStore.isAuthenticated ? router.push('/comunidad') : openAuth('login')">
           <div style="font-size:2rem;margin-bottom:0.75rem;color:var(--color-teal-dark)">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin:0 auto"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
           </div>
-          <h3 style="font-size:1rem;font-weight:700;margin:0 0 0.5rem">Compartir en Comunidad</h3>
+          <h3 style="font-size:1rem;font-weight:700;margin:0 0 0.5rem">Compartir en comunidad</h3>
           <p style="color:var(--color-text-secondary);font-size:0.85rem;margin:0;line-height:1.5">Comparte tus partituras con la comunidad y descubre las de otros músicos, compositores y bibliotecarios.</p>
         </div>
       </div>

@@ -18,17 +18,15 @@
 
       <!-- Pestañas de navegación principal -->
       <nav v-if="authStore.isAuthenticated" style="display:flex;gap:1.5rem;font-weight:600;color:var(--color-navy)">
-        <router-link to="/dashboard" style="text-decoration:none;color:inherit" active-class="text-teal-600">
-          Nueva partitura
-        </router-link>
         <router-link to="/biblioteca" style="text-decoration:none;color:inherit" active-class="text-teal-600">
-          Biblioteca
+          Mi biblioteca
+        </router-link>
+        
+        <router-link to="/mis-instituciones" style="text-decoration:none;color:inherit" active-class="text-teal-600">
+          Mis instituciones
         </router-link>
         <router-link to="/comunidad" style="text-decoration:none;color:inherit" active-class="text-teal-600">
           Comunidad
-        </router-link>
-        <router-link to="/mis-instituciones" style="text-decoration:none;color:inherit" active-class="text-teal-600">
-          Mis instituciones
         </router-link>
       </nav>
     </div>
@@ -36,7 +34,7 @@
     <!-- Bloque derecho: acceso anónimo -->
     <div v-if="!authStore.isAuthenticated" class="flex gap-2">
       <button class="btn btn-secondary" style="border-radius:9999px;padding:0.5rem 1.25rem" @click="$emit('openAuth', 'login')">
-        Iniciar Sesión
+        Iniciar sesión
       </button>
       <button class="btn btn-primary" style="border-radius:9999px;padding:0.5rem 1.25rem" @click="$emit('openAuth', 'register')">
         Registrarse

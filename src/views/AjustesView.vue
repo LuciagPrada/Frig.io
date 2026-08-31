@@ -20,11 +20,11 @@
           </svg>
         </div>
         <div>
-          <h2 style="margin:0 0 0.5rem;font-size:1.1rem;font-weight:700">Avatar de Perfil</h2>
+          <h2 style="margin:0 0 0.5rem;font-size:1.1rem;font-weight:700">Avatar de perfil</h2>
           <p style="color:var(--color-text-secondary);font-size:0.9rem;margin:0 0 1rem">Genera un nuevo avatar aleatorio para tu perfil.</p>
           <button class="btn btn-secondary" style="font-size:0.875rem;padding:0.5rem 1rem" @click="handleRandomizeAvatar" :disabled="savingAvatar">
             <span v-if="savingAvatar" class="spinner spinner-sm"/>
-            <span v-else>🎲 Randomizar Avatar</span>
+            <span v-else> Randomizar Avatar</span>
           </button>
         </div>
       </div>
@@ -33,7 +33,7 @@
       <div class="card" style="padding:2rem;margin-bottom:1.5rem">
         <h2 style="margin:0 0 1.5rem;font-size:1.1rem;font-weight:700">Información personal</h2>
         <div v-if="diasRestantes > 0" class="alert alert-warning" style="margin-bottom:1.5rem">
-          ⏳ No puedes modificar tu nombre o nickname hasta que pasen {{ diasRestantes }} días desde la última vez que los editaste.
+          No puedes modificar tu nombre o nickname hasta que pasen {{ diasRestantes }} días desde la última vez que los editaste.
         </div>
         <form @submit.prevent="handleSavePerfil">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
@@ -55,8 +55,8 @@
             <input :value="authStore.user?.email" type="email" class="form-input" disabled style="opacity:0.6;cursor:not-allowed"/>
             <p style="font-size:0.75rem;color:var(--color-text-secondary);margin:0.3rem 0 0">El email no se puede cambiar desde aquí</p>
           </div>
-          <div v-if="perfilSuccess" class="alert alert-success">✅ {{ perfilSuccess }}</div>
-          <div v-if="perfilError" class="alert alert-error">⚠️ {{ perfilError }}</div>
+          <div v-if="perfilSuccess" class="alert alert-success"> {{ perfilSuccess }}</div>
+          <div v-if="perfilError" class="alert alert-error"> {{ perfilError }}</div>
           <button type="submit" class="btn btn-primary" :disabled="savingPerfil || diasRestantes > 0">
             <span v-if="savingPerfil" class="spinner spinner-sm"/>
             {{ savingPerfil ? 'Guardando...' : 'Guardar cambios' }}
@@ -68,8 +68,8 @@
       <div class="card" style="padding:2rem;margin-bottom:1.5rem">
         <h2 style="margin:0 0 0.5rem;font-size:1.1rem;font-weight:700">Seguridad</h2>
         <p style="color:var(--color-text-secondary);font-size:0.9rem;margin:0 0 1.5rem">Se enviará un enlace seguro a tu correo electrónico para restablecer la contraseña.</p>
-        <div v-if="passError" class="alert alert-error" style="margin-bottom:1rem">⚠️ {{ passError }}</div>
-        <div v-if="passSuccess" class="alert alert-success" style="margin-bottom:1rem">✅ {{ passSuccess }}</div>
+        <div v-if="passError" class="alert alert-error" style="margin-bottom:1rem"> {{ passError }}</div>
+        <div v-if="passSuccess" class="alert alert-success" style="margin-bottom:1rem"> {{ passSuccess }}</div>
         <button class="btn btn-secondary" @click="handleResetPassword" :disabled="savingPass" style="display:flex;align-items:center;gap:0.5rem">
           <span v-if="savingPass" class="spinner spinner-sm"/>
           <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
