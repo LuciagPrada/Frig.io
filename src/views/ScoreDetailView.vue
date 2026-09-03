@@ -355,6 +355,7 @@ const comentariosCount = computed(() => partitura.value?.total_comentarios ?? 0)
 const editForm = reactive({
   titulo: '', autor: '', instrumento: '', ano_original: null, genero: '',
 })
+const misEtiquetas = ref([])
 const todasMisEtiquetas = ref([])
 const nuevaEtiqueta = ref('')
 const etiquetandoActivo = ref(false)
