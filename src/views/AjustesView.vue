@@ -50,16 +50,53 @@
             <label class="form-label">Nickname</label>
             <input v-model="form.nickname" type="text" class="form-input" placeholder="@tunickname" :disabled="diasRestantes > 0"/>
           </div>
-          <div class="form-group">
-            <label class="form-label">Email</label>
-            <input :value="authStore.user?.email" type="email" class="form-input" disabled style="opacity:0.6;cursor:not-allowed"/>
-            <p style="font-size:0.75rem;color:var(--color-text-secondary);margin:0.3rem 0 0">El email no se puede cambiar desde aquí</p>
-          </div>
           <div v-if="perfilSuccess" class="alert alert-success"> {{ perfilSuccess }}</div>
           <div v-if="perfilError" class="alert alert-error"> {{ perfilError }}</div>
           <button type="submit" class="btn btn-primary" :disabled="savingPerfil || diasRestantes > 0">
             <span v-if="savingPerfil" class="spinner spinner-sm"/>
             {{ savingPerfil ? 'Guardando...' : 'Guardar cambios' }}
+          </button>
+        </form>
+      </div>
+
+      <!-- cambio seguro de correo -->
+      <div class="card settings-card" style="padding:2rem;margin-bottom:1.5rem">
+        <h2 style="margin:0 0 0.5rem;font-size:1.1rem;font-weight:700">Correo electrónico</h2>
+        <p style="color:var(--color-text-secondary);font-size:0.9rem;margin:0 0 1.5rem">
+          Por seguridad, comprobaremos tu contraseña y Supabase te pedirá confirmar el cambio por correo.
+        </p>
+        <form @submit.prevent="handleChangeEmail">
+          <div class="form-group">
+            <label class="form-label">Correo actual</label>
+            <input :value="authStore.user?.email" type="email" class="form-input" readonly autocomplete="email"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nuevo correo</label>
+            <input
+              v-model.trim="emailForm.newEmail"
+              type="email"
+              class="form-input"
+              placeholder="nuevo@email.com"
+              autocomplete="email"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Contraseña actual</label>
+            <input
+              v-model="emailForm.password"
+              type="password"
+              class="form-input"
+              placeholder="Tu contraseña actual"
+              autocomplete="current-password"
+              required
+            />
+          </div>
+          <div v-if="emailSuccess" class="alert alert-success">{{ emailSuccess }}</div>
+          <div v-if="emailError" class="alert alert-error">{{ emailError }}</div>
+          <button type="submit" class="btn btn-primary" :disabled="savingEmail">
+            <span v-if="savingEmail" class="spinner spinner-sm"/>
+            {{ savingEmail ? 'Verificando...' : 'Solicitar cambio de correo' }}
           </button>
         </form>
       </div>
@@ -122,6 +159,7 @@ import { useRouter } from 'vue-router'
 import AppHeader from '../components/AppHeader.vue'
 import AuthModal from '../components/AuthModal.vue'
 import { useAuthStore } from '../stores/authStore.js'
+import AuthRepository from '../repositories/AuthRepository.js'
 import SupabaseClient from '../repositories/SupabaseClient.js'
 
 const authStore = useAuthStore()
@@ -130,6 +168,8 @@ const showAuth = ref(false)
 
 const form = reactive({ nombre: '', apellidos: '', nickname: '' })
 const perfilSuccess = ref(''); const perfilError = ref(''); const savingPerfil = ref(false)
+const emailForm = reactive({ newEmail: '', password: '' })
+const emailSuccess = ref(''); const emailError = ref(''); const savingEmail = ref(false)
 const passSuccess = ref(''); const passError = ref(''); const savingPass = ref(false)
 const savingAvatar = ref(false)
 const showConfirmDelete = ref(false); const deleteError = ref(''); const deletingAccount = ref(false)
@@ -198,6 +238,48 @@ async function handleSavePerfil() {
       authStore.user.last_profile_update = nowTimestamp
     }
   } catch (e) { perfilError.value = e.message } finally { savingPerfil.value = false }
+}
+
+function emailErrorMessage(error) {
+  const message = (error?.message || '').toLowerCase()
+  if (message.includes('invalid login credentials')) return 'La contraseña actual no es correcta.'
+  if (message.includes('already registered') || message.includes('already been registered')) return 'Ese correo ya está asociado a otra cuenta.'
+  if (message.includes('rate limit') || message.includes('too many')) return 'Se han realizado demasiados intentos. Espera unos minutos y vuelve a probar.'
+  return error?.message || 'No se pudo solicitar el cambio de correo.'
+}
+
+async function handleChangeEmail() {
+  emailSuccess.value = ''
+  emailError.value = ''
+
+  const currentEmail = (authStore.user?.email || '').trim().toLowerCase()
+  const newEmail = emailForm.newEmail.trim().toLowerCase()
+  if (!currentEmail) {
+    emailError.value = 'No se ha podido obtener el correo de la sesión actual.'
+    return
+  }
+  if (newEmail === currentEmail) {
+    emailError.value = 'El nuevo correo debe ser distinto del actual.'
+    return
+  }
+
+  savingEmail.value = true
+  try {
+    await AuthRepository.changeEmail({
+      currentEmail,
+      newEmail,
+      password: emailForm.password,
+      redirectTo: `${window.location.origin}/ajustes`,
+    })
+    emailForm.newEmail = ''
+    emailSuccess.value = 'Solicitud enviada. Revisa los correos de confirmación; el correo actual seguirá activo hasta completar la verificación.'
+  } catch (e) {
+    emailError.value = emailErrorMessage(e)
+  } finally {
+    // La contraseña nunca permanece guardada en el estado de la vista.
+    emailForm.password = ''
+    savingEmail.value = false
+  }
 }
 
 async function handleResetPassword() {

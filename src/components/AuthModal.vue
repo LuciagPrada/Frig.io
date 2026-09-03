@@ -9,7 +9,7 @@
           Inicia sesión o crea una cuenta para guardar tus partituras
         </p>
         <div class="tabs">
-          <button class="tab-btn" :class="{ active: tab === 'login' }" @click="tab = 'login'">Iniciar Sesión</button>
+          <button class="tab-btn" :class="{ active: tab === 'login' }" @click="tab = 'login'">Iniciar sesión</button>
           <button class="tab-btn" :class="{ active: tab === 'register' }" @click="tab = 'register'">Registrarse</button>
         </div>
       </div>
@@ -40,7 +40,7 @@
           </div>
           <button type="submit" class="btn btn-primary btn-full" :disabled="loading">
             <span v-if="loading" class="spinner spinner-sm"/>
-            {{ loading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
+            {{ loading ? 'Iniciando sesión...' : 'Iniciar sesión' }}
           </button>
         </form>
 
