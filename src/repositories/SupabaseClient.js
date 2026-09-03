@@ -23,7 +23,6 @@ class SupabaseClientSingleton {
   }
 }
 
-//Singleton
 let instance = null
 const getInstance = () => {
   if (!instance) {

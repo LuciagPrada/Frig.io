@@ -1,7 +1,6 @@
 <template>
   <div class="modal-backdrop">
     <div class="modal modal-sm" style="text-align:center;padding:2.5rem 2rem">
-      <!-- Spiner -->
       <div style="display:flex;justify-content:center;margin-bottom:1.5rem">
         <div class="spinner" style="width:56px;height:56px;border-width:5px"/>
       </div>
@@ -11,7 +10,6 @@
         {{ currentStatus }}
       </p>
 
-      <!-- Pasos -->
       <div style="text-align:left;background:var(--color-bg);border-radius:var(--radius-sm);padding:1rem;margin-bottom:1.5rem">
         <div v-for="(step, i) in steps" :key="i" style="display:flex;align-items:center;gap:0.6rem;padding:0.3rem 0">
           <span :style="{ fontSize:'0.9rem', opacity: i <= currentStepIndex ? 1 : 0.35, display:'flex', alignItems:'center', justifyContent:'center', width:'20px' }">

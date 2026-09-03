@@ -1,8 +1,6 @@
 <template>
-  <!-- Backdrop -->
   <div class="modal-backdrop" @click.self="$emit('close')">
     <div class="modal modal-sm" style="padding:0">
-      <!-- Tabs -->
       <div class="auth-modal-header" style="padding:1.5rem 2rem 0">
         <h2 style="margin:0 0 0.25rem;font-size:1.25rem;font-weight:700">Accede a tu cuenta</h2>
         <p style="color:var(--color-text-secondary);font-size:0.875rem;margin:0 0 1.25rem">
@@ -14,7 +12,6 @@
         </div>
       </div>
 
-      <!-- Formulario -->
       <div class="auth-modal-body" style="padding:1.5rem 2rem 2rem">
         <!-- alerta error -->
         <div v-if="error" class="alert alert-error" style="display:flex;align-items:center;gap:0.5rem">
@@ -22,7 +19,6 @@
           {{ error }}
         </div>
 
-        <!-- LOGIN -->
         <form v-if="tab === 'login'" @submit.prevent="handleLogin">
           <div class="form-group">
             <label class="form-label">Email</label>
@@ -44,7 +40,6 @@
           </button>
         </form>
 
-        <!-- REGISTRO -->
         <form v-else @submit.prevent="handleRegister">
           <div class="auth-name-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
             <div class="form-group">
@@ -97,7 +92,6 @@ const router = useRouter()
 const tab = ref(props.initialTab)
 const loading = ref(false)
 const error = ref('')
-//Visibilidad independiente de cada campo de contraseña (login / registro)
 const showPassLogin = ref(false)
 const showPassRegister = ref(false)
 

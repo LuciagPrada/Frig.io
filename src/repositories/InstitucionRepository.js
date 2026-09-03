@@ -1,12 +1,8 @@
 //InstitucionRepository 
-//Un usuario puede administrar o pertenecer a varias instituciones
 import SupabaseClient from './SupabaseClient.js'
 
 const getDB = () => SupabaseClient.getInstance().getDB()
 
-//El email de los miembros ya no se lee por columna directa (RLS/privilegios
-//lo impiden); se obtiene siempre a través de la función get_miembros_institucion,
-//que ya comprueba que quien llama pertenece a esa institución.
 async function attachMiembrosConEmail(inst) {
   if (!inst) return inst
   const db = getDB()
@@ -40,7 +36,7 @@ const InstitucionRepository = {
     return data.id_institucion
   },
 
-  //Añade un usuario como miembro de una institución
+  //Añade un usuario como miembro normal de una institución
   async addMiembro(instId, uid) {
     const db = getDB()
     const { error } = await db
@@ -50,8 +46,6 @@ const InstitucionRepository = {
     return true
   },
 
-  //Busca el id de un usuario por su email exacto (para invitar a una institución).
-  //Pasa por una función de BD que no expone el email de nadie, solo el id.
   async buscarUsuarioPorEmail(email) {
     const db = getDB()
     const { data, error } = await db.rpc('buscar_usuario_por_email', { p_email: email })
@@ -59,7 +53,6 @@ const InstitucionRepository = {
     return data || null
   },
 
-  //Elimina a un usuario de una institución
   async removeMiembro(instId, uid) {
     const db = getDB()
     const { error } = await db
@@ -70,7 +63,6 @@ const InstitucionRepository = {
     if (error) throw error
   },
 
-  //Obtiene todas las instituciones donde el usuario es ADMINISTRADOR
   async getAllByAdmin(uid) {
     const db = getDB()
     const { data, error } = await db
@@ -96,7 +88,6 @@ const InstitucionRepository = {
     return insts
   },
 
-  //Devuelve todas las instituciones del usuario sin duplicados, añadiendo el campo rolUsuario ('ADMINISTRADOR' | 'MIEMBRO')
   async getAllByUsuario(uid) {
     const [adminInsts, miembroInsts] = await Promise.all([
       InstitucionRepository.getAllByAdmin(uid),
@@ -127,7 +118,6 @@ const InstitucionRepository = {
     return attachMiembrosConEmail(data)
   },
 
-  //Actualiza nombre/descripción de una institución
   async update(instId, campos) {
     const db = getDB()
     const { error } = await db
@@ -137,7 +127,6 @@ const InstitucionRepository = {
     if (error) throw error
   },
 
-  //Elimina una institución (ON DELETE CASCADE gestiona miembros)
   async eliminar(instId) {
     const db = getDB()
     const { error } = await db

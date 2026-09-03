@@ -9,7 +9,6 @@
     </button>
 
     <div v-if="open" class="dropdown notification-panel" style="min-width:320px;max-width:360px;max-height:420px;overflow-y:auto;z-index:100">
-      <!-- Sección 1: solicitudes de ingreso a las instituciones que administra -->
       <template v-if="solicitudes.length">
         <div class="notif-head">Solicitudes de ingreso</div>
         <div v-for="s in solicitudes" :key="s.id_solicitud" class="notif-item notif-pending">
@@ -29,7 +28,6 @@
         </div>
       </template>
 
-      <!-- Sección 2: reportes sobre las partituras propias -->
       <div class="notif-head">Reportes sobre tus partituras</div>
 
       <div v-if="!reportes.length" class="notif-empty">
@@ -52,7 +50,6 @@
       </div>
     </div>
 
-    <!-- Backdrop para cerrar el desplegable -->
     <div v-if="open" style="position:fixed;inset:0;z-index:98" @click="open = false"/>
   </div>
 </template>
@@ -72,8 +69,6 @@ const open = ref(false)
 const reportes = ref([])
 const solicitudes = ref([])
 
-//El badge suma las dos cosas que requieren atención: reportes sin leer y
-//solicitudes de ingreso pendientes de resolver.
 const noLeidos = computed(
   () => reportes.value.filter(r => !r.leido).length + solicitudes.value.length
 )
@@ -98,12 +93,9 @@ async function cargar() {
     solicitudCtrl.getPendientesAdmin(),
   ])
   reportes.value = rep
-  //resolviendo/error son estado local de cada fila mientras se acepta o rechaza
   solicitudes.value = (sol || []).map(s => ({ ...s, resolviendo: false, error: '' }))
 }
 
-//Al aceptar o rechazar basta con quitar la fila de la lista local: el contador
-//es un computed y se actualiza solo, sin recargar toda la campana.
 async function resolverSolicitud(s, aceptar) {
   s.error = ''
   s.resolviendo = true
@@ -117,7 +109,6 @@ async function resolverSolicitud(s, aceptar) {
 }
 
 onMounted(cargar)
-//Si el usuario inicia sesión sin recargar la página, se vuelven a pedir
 watch(() => authStore.isAuthenticated, cargar)
 
 function toggle() { open.value = !open.value }

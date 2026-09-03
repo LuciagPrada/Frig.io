@@ -2,12 +2,10 @@
   <div>
     <AppHeader @open-auth="showAuth = true"/>
 
-    <!-- cargando -->
     <div v-if="loading" style="display:flex;justify-content:center;padding:5rem">
       <div class="spinner"/>
     </div>
 
-    <!-- no encontrada / sin acceso -->
     <div v-else-if="!partitura" class="page-container" style="text-align:center;padding-top:4rem">
       <h2 style="font-weight:700;margin:0 0 0.5rem">No se ha podido cargar la partitura</h2>
       <p style="color:var(--color-text-secondary);margin:0 0 1.5rem">
@@ -17,7 +15,6 @@
     </div>
 
     <template v-else>
-      <!-- barra de acciones fija -->
       <div class="detail-bar">
         <button class="btn btn-secondary" style="flex-shrink:0" @click="volver">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
@@ -47,9 +44,6 @@
               Editar
             </button>
 
-            <!-- Etiquetar: en la barra de acciones (no en la tarjeta de
-                 metadatos) para que el desplegable no quede recortado por
-                 el overflow:hidden de las tarjetas .card. -->
             <div style="position:relative">
               <button class="btn btn-ghost" @click="abrirEtiquetar">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -77,7 +71,6 @@
                   Todavía no tienes etiquetas creadas.
                 </p>
 
-                <!-- crear una etiqueta nueva, al final de la lista -->
                 <form v-if="mostrandoNuevaEtiqueta" style="display:flex;gap:0.4rem;padding:0.6rem 1rem" @submit.prevent="añadirEtiqueta">
                   <input
                     ref="etiquetaInputRef"
@@ -117,7 +110,6 @@
       </div>
 
       <div class="page-container" style="max-width:960px">
-        <!-- panel de visibilidad -->
         <div v-if="isShareMode" class="card" style="padding:1rem;margin-bottom:1.5rem">
           <p style="font-size:0.85rem;font-weight:600;margin:0 0 0.75rem">Mover partitura a:</p>
           <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
@@ -135,7 +127,6 @@
 
         <div v-if="mensajeOk" class="alert alert-success" style="margin-bottom:1.5rem">{{ mensajeOk }}</div>
 
-        <!-- título / autor -->
         <div style="margin-bottom:1.5rem">
           <template v-if="!isEditing">
             <h1 class="page-title" style="margin:0 0 0.25rem">{{ partitura.titulo }}</h1>
@@ -166,7 +157,6 @@
           </template>
         </div>
 
-        <!-- transcripción renderizada con Verovio -->
         <div class="card" style="padding:0;overflow:hidden;margin-bottom:1.5rem">
           <div v-if="renderLoading" style="display:flex;flex-direction:column;align-items:center;gap:1rem;padding:3rem">
             <div class="spinner"/>
@@ -185,7 +175,6 @@
           </div>
         </div>
 
-        <!-- información adicional -->
         <div class="card" style="padding:1.5rem;margin-bottom:1.5rem">
           <h3 style="margin:0 0 1rem;font-size:1rem;font-weight:700;color:var(--color-navy)">
             Información de la partitura
@@ -207,7 +196,6 @@
             </tbody>
           </table>
 
-          <!-- fiabilidad -->
           <div v-if="fiabilidad != null" style="margin-top:1.25rem;max-width:320px">
             <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:0.35rem">
               <span style="color:var(--color-text-secondary)">Fiabilidad OMR</span>
@@ -226,10 +214,6 @@
           </div>
         </div>
 
-        <!-- Etiquetas privadas del usuario sobre esta partitura.
-             Cualquier usuario autenticado puede etiquetar cualquier partitura
-             que pueda ver (sea suya o no), y solo él ve sus propias etiquetas.
-             No tiene nada que ver con el modo de edición de metadatos. -->
         <div class="card" style="padding:1.5rem;margin-bottom:1.5rem">
           <h3 style="margin:0 0 0.35rem;font-size:1rem;font-weight:700;color:var(--color-navy)">
             Mis etiquetas
@@ -248,7 +232,6 @@
           </p>
         </div>
 
-        <!-- comentarios -->
         <div class="card" style="padding:1.5rem">
           <ComentariosSection
             :partitura-id="partitura.id_partitura"
@@ -265,14 +248,12 @@
       </div>
     </template>
 
-    <!-- reproductor -->
     <VerovioViewer
       v-if="showVerovio && verovioXml"
       :musicxml="verovioXml"
       @close="showVerovio = false"
     />
 
-    <!-- modal de reporte -->
     <div v-if="showReporte" class="modal-overlay" @click.self="showReporte = false">
       <div class="modal-box card" style="max-width:460px;width:90%;padding:2rem">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
@@ -344,7 +325,6 @@ const ctrl = usePartituraController()
 const instCtrl = useInstitucionController()
 const reporteCtrl = useReporteController()
 const etiquetaCtrl = useEtiquetaController()
-
 const partitura = ref(null)
 const loading = ref(true)
 const showAuth = ref(false)
@@ -352,17 +332,11 @@ const isEditing = ref(false)
 const isShareMode = ref(false)
 const isLiked = ref(false)
 const mensajeOk = ref('')
-
-//render de la transcripción
 const svgContent = ref('')
 const renderLoading = ref(false)
 const renderError = ref('')
-
-//reproductor
 const showVerovio = ref(false)
 const verovioXml = ref('')
-
-//reporte
 const showReporte = ref(false)
 const reporteMotivo = ref('copyright')
 const reporteComentario = ref('')
@@ -373,23 +347,14 @@ const motivosReporte = [
   { valor: 'mala_calidad', etiqueta: 'Mala calidad' },
   { valor: 'otro',         etiqueta: 'Otro' },
 ]
-
 const esPropio    = computed(() => !!partitura.value && authStore.user?.id === partitura.value.id_propietario)
 const fiabilidad  = computed(() => partitura.value?.transcripciones?.[0]?.porcentaje_fiabilidad ?? null)
 const musicxml    = computed(() => partitura.value?.transcripciones?.[0]?.contenido_resultado || partitura.value?.transcripciones?.[0]?.musicxml_content || '')
-//Supabase devuelve los conteos embebidos (`likes(count)`) como [{ count: N }];
-//`total_comentarios` es una columna calculada (ya es un número).
 const likesCount = computed(() => partitura.value?.likes?.[0]?.count ?? 0)
 const comentariosCount = computed(() => partitura.value?.total_comentarios ?? 0)
-
 const editForm = reactive({
   titulo: '', autor: '', instrumento: '', ano_original: null, genero: '',
 })
-
-//etiquetas privadas del usuario sobre esta partitura
-const misEtiquetas = ref([])
-//Todas las etiquetas que el usuario ha creado alguna vez (en cualquier
-//partitura), para poder reutilizarlas aquí en vez de escribirlas de nuevo.
 const todasMisEtiquetas = ref([])
 const nuevaEtiqueta = ref('')
 const etiquetandoActivo = ref(false)
@@ -426,7 +391,6 @@ async function cargarMisEtiquetas() {
     etiquetaCtrl.getMisEtiquetas(authStore.user.id),
   ])
   misEtiquetas.value = propias
-  //Nombres de etiqueta distintos, sin importar en qué partitura se crearon.
   todasMisEtiquetas.value = [...new Set(todas.map(t => t.etiqueta))].sort((a, b) => a.localeCompare(b, 'es'))
 }
 
@@ -440,9 +404,6 @@ async function cargar() {
     loading.value = false
   }
 }
-
-//Renderiza el MusicXML de la transcripción como SVG e inyecta el resultado
-//saneado en la página (misma tubería que el PDF, pero sin generar PDF).
 async function renderTranscripcion() {
   if (!musicxml.value) { svgContent.value = ''; return }
   renderLoading.value = true
@@ -451,7 +412,6 @@ async function renderTranscripcion() {
     const tk = await getVerovioToolkit()
     tk.setOptions({ scale: 40, pageWidth: 2000, adjustPageHeight: true, breaks: 'auto' })
     tk.loadData(musicxml.value)
-    //El SVG viene de contenido subido por usuarios: se sanea antes de inyectarlo.
     svgContent.value = DOMPurify.sanitize(tk.renderToSVG(1), {
       USE_PROFILES: { svg: true, svgFilters: true },
       ADD_TAGS: ['use'],
@@ -485,10 +445,6 @@ function startEdit() {
   isEditing.value = true
 }
 
-//Etiquetar requiere sesión: sin ella se abre el modal de login igual que el
-//resto de acciones (comentar, dar me gusta, reportar). El panel muestra
-//primero las etiquetas que el usuario ya tiene creadas (para reutilizarlas)
-//y, al final, la opción de crear una nueva.
 function abrirEtiquetar() {
   if (!authStore.isAuthenticated) { showAuth.value = true; return }
   etiquetaError.value = ''
@@ -511,10 +467,6 @@ function abrirNuevaEtiqueta() {
   nextTick(() => etiquetaInputRef.value?.focus())
 }
 
-//Marca/desmarca en esta partitura una etiqueta que el usuario ya había
-//creado antes. La lista de "Mis etiquetas" del panel no quita la etiqueta
-//al aplicarla: se queda ahí marcada (tick azul) para poder quitarla
-//volviendo a pulsarla.
 async function toggleEtiquetaExistente(tag) {
   etiquetaError.value = ''
   const yaMarcada = misEtiquetas.value.includes(tag)

@@ -58,9 +58,6 @@ const PartituraRepository = {
       .order('fecha_subida', { ascending: false })
 
     if (query) {
-      //Las comas y paréntesis tienen significado especial en la sintaxis de
-      //filtros de PostgREST (.or(...)): se quitan para que el texto de
-      //búsqueda no pueda inyectar condiciones adicionales.
       const safeQuery = query.replace(/[,()]/g, '')
       q = q.or(`titulo.ilike.%${safeQuery}%,autor.ilike.%${safeQuery}%`)
     }
@@ -72,7 +69,6 @@ const PartituraRepository = {
     return data || []
   },
 
-  //Carga los datos completos de una partitura pública para la vista de comunidad, incluyendo su última transcripción y el hilo de comentarios con mensajes
   async getPartituraCommunityDetail(partituraId) {
     const db = getDB()
     const { data, error } = await db
@@ -87,10 +83,6 @@ const PartituraRepository = {
     return data
   },
 
-  //Carga una partitura concreta con los mismos joins que el detalle de comunidad
-  //pero sin filtrar por es_publica: sirve también para partituras propias,
-  //privadas o institucionales (la RLS de partituras_select_public ya decide
-  //quién puede verla).
   async getPartituraById(partituraId) {
     const db = getDB()
     const { data, error } = await db

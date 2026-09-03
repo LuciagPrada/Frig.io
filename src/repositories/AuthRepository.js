@@ -3,11 +3,9 @@ import SupabaseClient from './SupabaseClient.js'
 
 const auth = SupabaseClient.getInstance().getAuth()
 
-//Espera (con reintentos cortos) a que el trigger handle_new_user haya
-//creado la fila en public.usuarios, en vez de una espera fija arbitraria.
 async function waitForUsuarioRow(db, uid, attempts = 6, delayMs = 300) {
   for (let i = 0; i < attempts; i++) {
-    const { data } = await db.from('usuarios').select('id').eq('id', uid).maybeSingle()
+    const { data } = await db.from('usuarios').select('id').eq('id', uid).maybeSingle() //Espera a que el trigger handle_new_user haya creado la fila en public.usuarios
     if (data) return true
     await new Promise(r => setTimeout(r, delayMs))
   }
@@ -23,7 +21,6 @@ const AuthRepository = {
 
   async register(datos) {
     //Registrar en Auth y pasar los metadatos del perfil para que el trigger los recoja automáticamente en public.usuarios
-    //trigger handle_new_user se encarga de insert
     const { data, error } = await auth.signUp({
       email: datos.email,
       password: datos.password,
@@ -37,7 +34,6 @@ const AuthRepository = {
     })
     if (error) throw error
 
-    //El trigger handle_new_user inserta la fila en public.usuarios automáticamente
     if (data.user) {
       try {
         const db = SupabaseClient.getInstance().getDB()
@@ -72,8 +68,6 @@ const AuthRepository = {
   },
 
   async changeEmail({ currentEmail, newEmail, password, redirectTo }) {
-    // Una sesión abierta no basta para una operación sensible: se vuelve a
-    // comprobar la contraseña antes de solicitar el cambio a Supabase Auth.
     const { data: sessionData, error: sessionError } = await auth.getSession()
     if (sessionError) throw sessionError
 

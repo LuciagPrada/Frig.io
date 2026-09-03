@@ -2,7 +2,6 @@
   <div>
     <AppHeader @open-auth="openAuth"/>
 
-    <!-- seccción -->
     <section class="landing-hero" style="background:var(--color-teal);padding:4rem 2rem;text-align:center">
       <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="var(--color-navy)" stroke-width="2" style="margin-bottom:1rem;margin-left:auto;margin-right:auto">
         <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
@@ -16,9 +15,7 @@
       </p>
     </section>
 
-    <!-- contenido principal -->
     <div class="page-container" style="max-width:960px">
-      <!-- CTA card -->
       <div class="card landing-cta" style="padding:2.5rem;text-align:center;margin-bottom:2rem">
         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-teal-dark)" stroke-width="2" style="margin-bottom:1rem;margin-left:auto;margin-right:auto">
           <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
@@ -35,7 +32,6 @@
         </router-link>
       </div>
 
-      <!-- ¿Qué es? -->
       <section class="card" style="padding:2rem;margin-bottom:1.5rem">
         <h2 style="font-size:1.2rem;font-weight:700;margin:0 0 1rem;display:flex;align-items:center;gap:0.5rem">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m12 16v-4"/><path d="m12 8h.01"/></svg>
@@ -50,7 +46,6 @@
         </p>
       </section>
 
-      <!-- ¿Cómo se usa? -->
       <section class="card" style="padding:2rem;margin-bottom:2rem">
         <h2 style="font-size:1.2rem;font-weight:700;margin:0 0 1.5rem;display:flex;align-items:center;gap:0.5rem">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 4 10-2 10 2v16l-10-2-10 2z"/><path d="m12 2v16"/></svg>
@@ -69,7 +64,6 @@
         </div>
       </section>
 
-      <!-- tarjetas de características -->
       <div class="responsive-three-column-grid" style="margin-bottom:2rem">
         <div class="card cursor-pointer hover-effect" style="padding:1.5rem;text-align:center;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s" @click="showProjectPopup = true">
           <div style="font-size:2rem;margin-bottom:0.75rem;color:var(--color-teal-dark)">
@@ -95,10 +89,8 @@
       </div>
     </div>
 
-    <!-- modal  de autenticación -->
     <AuthModal v-if="showAuth" :initial-tab="authTab" @close="showAuth = false"/>
 
-    <!-- modal de información del proyecto -->
     <div v-if="showProjectPopup" class="landing-modal-overlay" style="position:fixed;inset:0;background:rgba(15,23,42,0.6);backdrop-filter:blur(4px);z-index:90;display:flex;align-items:center;justify-content:center" @click.self="showProjectPopup = false">
       <div class="card" style="width:100%;max-width:500px;padding:2rem;position:relative">
         <button class="btn-close" @click="showProjectPopup = false" style="position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--color-text-secondary)">&times;</button>

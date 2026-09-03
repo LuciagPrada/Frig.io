@@ -4,8 +4,7 @@ import SupabaseClient from './SupabaseClient.js'
 const getDB = () => SupabaseClient.getInstance().getDB()
 
 const ReporteRepository = {
-  //Crea un reporte sobre una partitura ajena. La RLS comprueba que el usuario
-  //no es el propietario y que puede ver la partitura.
+  //Crea un reporte sobre una partitura ajena
   async crear(idPartitura, motivo, comentario = '') {
     const db = getDB()
     const { data: { user } } = await db.auth.getUser()
@@ -21,7 +20,6 @@ const ReporteRepository = {
     return true
   },
 
-  //Reportes sobre las partituras del usuario autenticado (incluye titulo_partitura)
   async getReportesPropietario() {
     const db = getDB()
     const { data, error } = await db.rpc('get_reportes_propietario')
@@ -32,7 +30,6 @@ const ReporteRepository = {
     return data || []
   },
 
-  //Marca un reporte como leído (solo el propietario de la partitura puede)
   async marcarLeido(idReporte) {
     const db = getDB()
     const { error } = await db

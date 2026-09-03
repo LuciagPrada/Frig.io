@@ -15,7 +15,6 @@
       @change="onFileChange"
     />
 
-    <!-- Fichero no seleccionado-->
     <div v-if="!file" style="text-align:center">
       <svg class="upload-icon" style="margin:0 auto 0.75rem;display:block" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -31,7 +30,6 @@
       </p>
     </div>
 
-    <!-- Fichero seleccionado -->
     <div v-else style="text-align:center">
       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-navy)" stroke-width="1.5" style="margin:0 auto 0.5rem;display:block">
         <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
@@ -46,7 +44,6 @@
     </div>
   </div>
 
-  <!-- Error -->
   <div v-if="validationError" class="alert alert-error" style="margin-top:0.75rem;display:flex;align-items:center;gap:0.5rem">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
     {{ validationError }}
@@ -62,8 +59,6 @@ const props = defineProps({ file: { default: null } })
 
 const file = ref(props.file)
 
-//Si el padre resetea el archivo desde fuera (p.ej. tras guardar la
-//partitura), reflejarlo aquí para que el dropzone vuelva a su estado vacío.
 watch(() => props.file, (v) => { file.value = v })
 const isDragging = ref(false)
 const validationError = ref('')

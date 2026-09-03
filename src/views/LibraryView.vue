@@ -3,7 +3,6 @@
     <AppHeader @open-auth="showAuth = true"/>
 
     <div class="page-container">
-      <!-- cabecera -->
       <div class="page-toolbar" style="margin-bottom:1.5rem">
         <div>
           <h1 class="page-title" style="display:flex;align-items:center;gap:0.75rem;margin:0 0 0.5rem">
@@ -30,12 +29,10 @@
         </div>
       </div>
 
-      <!-- loading -->
       <div v-if="loading" style="display:flex;justify-content:center;padding:3rem;margin-top:2rem">
         <div class="spinner"/>
       </div>
 
-      <!-- grid de partituras -->
       <div v-else-if="partiturasFiltradas.length" class="score-grid" style="margin-top:0.5rem">
         <ScoreCard
           v-for="p in partiturasFiltradas"
@@ -45,7 +42,6 @@
         />
       </div>
 
-      <!-- sin partituras (o sin resultados para el filtro) -->
       <div v-else style="text-align:center;padding:4rem 2rem;margin-top:2rem">
         <div style="font-size:3rem;margin-bottom:1rem;color:var(--color-text-secondary)">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>

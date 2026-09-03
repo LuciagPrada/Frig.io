@@ -11,12 +11,10 @@
         </button>
       </div>
       <div class="modal-body" style="display:flex;flex-direction:column;gap:1.5rem">
-        <!-- cargando -->
         <div v-if="loading" style="display:flex;flex-direction:column;align-items:center;gap:1rem;padding:2rem">
           <div class="spinner"/>
           <p style="color:var(--color-text-secondary)">Renderizando partitura...</p>
         </div>
-        <!-- contenido -->
         <div v-else-if="svgContent" style="display:flex;flex-direction:column;gap:1rem">
           <div class="viewer-controls" style="display:flex;align-items:center;gap:1rem;background:var(--color-surface);padding:1rem;border-radius:var(--radius-md);border:1px solid var(--color-border)">
             <button class="btn btn-primary" @click="togglePlay" :disabled="!isReady" style="display:flex;align-items:center;gap:0.4rem;min-width:140px;justify-content:center">
@@ -32,9 +30,7 @@
           </div>
           <div v-html="svgContent" style="width:100%;overflow-x:auto;padding:1rem;background:#fff;border-radius:var(--radius-md);border:1px solid var(--color-border)"/>
         </div>
-        <!-- Error -->
         <div v-else-if="error" class="alert alert-error">{{ error }}</div>
-        <!--Sin contenido -->
         <div v-else class="alert alert-info">No hay contenido MusicXML para mostrar.</div>
       </div>
     </div>
@@ -67,22 +63,12 @@ onMounted(async () => {
     const tk = await getVerovioToolkit()
     tk.setOptions({ scale: 40, pageWidth: 2000, adjustPageHeight: true, breaks: 'auto' })
     tk.loadData(props.musicxml)
-    //El SVG lo genera Verovio a partir de contenido subido por usuarios: se
-    //sanea antes de inyectarlo en el DOM por si el propio MusicXML trae algo malicioso.
-    //Verovio dibuja las cabezas de nota reutilizando glifos con
-    //<use xlink:href="#glifo">, pero el perfil svg de DOMPurify excluye la
-    //etiqueta <use> por defecto (vector conocido de mutation-XSS) y también
-    //elimina xlink:href/href. Aquí el href siempre es una referencia interna
-    //(#id) generada por el propio Verovio, nunca una URL controlada por el
-    //usuario, y DOMPurify sigue validando el valor de la URI igualmente
-    //(bloquea javascript:/data:/externas), así que es seguro reactivarla.
     svgContent.value = DOMPurify.sanitize(tk.renderToSVG(1), {
       USE_PROFILES: { svg: true, svgFilters: true },
       ADD_TAGS: ['use'],
       ADD_ATTR: ['xlink:href', 'href'],
     })
 
-    // Initialize MIDI logic softly
     const base64midi = tk.renderToMIDI()
     window.generatedMidi = base64midi
 
@@ -103,8 +89,6 @@ onBeforeUnmount(() => {
     audioCtx.close()
     audioCtx = null
   }
-  //Limpiar las etiquetas <script> que hemos añadido nosotros para no
-  //acumular duplicados cada vez que se abre el visor.
   for (const s of loadedScripts) s.remove()
   loadedScripts.length = 0
 })

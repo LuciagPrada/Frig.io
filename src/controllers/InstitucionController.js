@@ -6,7 +6,6 @@ import PartituraRepository from '../repositories/PartituraRepository.js'
 import { useAuthStore } from '../stores/authStore.js'
 
 export function useInstitucionController() {
-  //Array de todas las instituciones del usuario
   const instituciones = ref([])
   const loading = ref(false)
   const error = ref(null)
@@ -16,7 +15,6 @@ export function useInstitucionController() {
     return store.user?.id
   }
 
-  //Carga todas las instituciones en las que participa el usuario
   async function cargar() {
     loading.value = true
     error.value = null
@@ -49,10 +47,6 @@ export function useInstitucionController() {
     }
   }
 
-  //Solicita el ingreso a una institución existente por ID. Ya no se entra
-  //directamente: la RLS solo deja insertar en miembros_institucion al
-  //administrador, así que se crea una solicitud que él debe aprobar. No se
-  //recarga la lista de instituciones porque el usuario todavía no es miembro.
   async function unirse(instId) {
     loading.value = true
     error.value = null
@@ -69,7 +63,6 @@ export function useInstitucionController() {
     }
   }
 
-  //Invita a un usuario a una institución específica buscándolo por email
   async function invitarMiembro(instId, email) {
     const usuarioId = await InstitucionRepository.buscarUsuarioPorEmail(email)
     if (!usuarioId) throw new Error('No se encontró ningún usuario con ese email.')

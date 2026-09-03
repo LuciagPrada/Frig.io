@@ -1,10 +1,4 @@
-// Carga perezosa y compartida del toolkit WASM de Verovio.
-// El script define `window.verovio` en cuanto se ejecuta, pero el runtime
-// WASM (`verovio.module`) todavía tarda un poco en inicializarse: construir
-// el toolkit antes de que `onRuntimeInitialized` dispare provoca errores
-// tipo "getToolkitFunction(...) is not a function" o renders a medias.
-// La promesa se cachea en el módulo para que solo se cargue/inicialice una
-// vez aunque varios componentes la pidan (o la pidan varias veces).
+// Carga del toolkit WASM de Verovio
 let verovioReadyPromise = null
 
 const VEROVIO_SRC = 'https://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js'

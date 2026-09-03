@@ -28,7 +28,6 @@ const ComentarioRepository = {
     }))
   },
 
-  //Crea un nuevo comentario raíz sobre una partitura
   async addComentario(partituraId, userId, contenido) {
     if (!contenido?.trim()) throw new Error('El comentario no puede estar vacío.')
     const db = getDB()
@@ -41,7 +40,6 @@ const ComentarioRepository = {
     return data
   },
 
-  //Elimina un comentario. Los mensajes de respuesta se eliminan en cascada (ON DELETE CASCADE)
   async deleteComentario(comentarioId, userId) {
     const db = getDB()
     const { error } = await db
@@ -53,9 +51,7 @@ const ComentarioRepository = {
     return true
   },
 
-  //Mensajes (respuestas a comentarios)
 
-  //Crea una respuesta (mensaje) a un comentario existente
   async addMensaje(comentarioId, userId, contenido) {
     if (!contenido?.trim()) throw new Error('La respuesta no puede estar vacía.')
     const db = getDB()
@@ -68,7 +64,6 @@ const ComentarioRepository = {
     return data
   },
 
-  //Elimina una respuesta (solo el propio usuario)
   async deleteMensaje(mensajeId, userId) {
     const db = getDB()
     const { error } = await db

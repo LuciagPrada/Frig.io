@@ -2,7 +2,6 @@
   <div>
     <AppHeader @open-auth="showAuth = true"/>
 
-    <!-- ====== BIBLIOTECA DE UNA INSTITUCIÓN ====== -->
     <div v-if="instAbierta" class="page-container">
       <div class="institution-library-toolbar" style="display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap">
         <div>
@@ -61,7 +60,6 @@
       </div>
     </div>
 
-    <!-- ====== SELECTOR DE INSTITUCIONES ====== -->
     <div v-else class="page-container" style="max-width:860px">
       <!-- cabecera -->
       <div class="institution-heading" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem">
@@ -76,7 +74,6 @@
           <p class="page-subtitle" style="margin:0">Gestiona las instituciones a las que perteneces o que administras</p>
         </div>
 
-        <!-- botón + con menú -->
         <div style="position:relative">
           <button class="btn btn-primary" style="display:flex;align-items:center;gap:0.5rem" @click="toggleMenu">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
@@ -95,12 +92,10 @@
         </div>
       </div>
 
-      <!-- cargando -->
       <div v-if="loading" style="display:flex;justify-content:center;padding:4rem">
         <div class="spinner"/>
       </div>
 
-      <!-- sin instituciones -->
       <div v-else-if="!instituciones.length" style="text-align:center;padding:5rem 2rem">
         <div style="margin:0 auto 1.5rem;width:72px;height:72px;border-radius:50%;background:var(--color-bg);border:2px solid var(--color-border);display:flex;align-items:center;justify-content:center">
           <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5">
@@ -122,7 +117,6 @@
         </div>
       </div>
 
-      <!-- grid de cards -->
       <div v-else class="inst-grid">
         <div
           v-for="inst in instituciones"
@@ -155,7 +149,6 @@
 
     <div v-if="showMenu" style="position:fixed;inset:0;z-index:99" @click="showMenu = false"/>
 
-    <!-- crear institución -->
     <div v-if="showCrear" class="modal-overlay" @click.self="showCrear = false">
       <div class="modal-box card" style="max-width:460px;width:90%;padding:2rem">
         <div class="modal-head">
@@ -183,7 +176,6 @@
       </div>
     </div>
 
-    <!-- unirse a institución -->
     <div v-if="showUnirse" class="modal-overlay" @click.self="showUnirse = false">
       <div class="modal-box card" style="max-width:460px;width:90%;padding:2rem">
         <div class="modal-head">
@@ -225,7 +217,6 @@
       </div>
     </div>
 
-    <!-- gestionar institución -->
     <div v-if="instSeleccionada" class="modal-overlay" @click.self="cerrarGestionar">
       <div class="modal-box card" style="max-width:680px;width:95%;padding:0;overflow:hidden">
         <div class="manage-modal-header" style="padding:1.5rem 2rem;border-bottom:1px solid var(--color-border);display:flex;align-items:center;justify-content:space-between">
@@ -253,7 +244,6 @@
 
           <div v-if="gestionSuccess" class="alert alert-success" style="margin-bottom:1.5rem">{{ gestionSuccess }}</div>
 
-          <!-- Tabla de miembros -->
           <div class="card members-table-wrap" style="overflow:hidden;margin-bottom:1.5rem">
             <div style="padding:1rem 1.25rem;border-bottom:1px solid var(--color-border);font-weight:700;display:flex;align-items:center;gap:0.5rem;font-size:0.95rem">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -292,7 +282,6 @@
             </table>
           </div>
 
-          <!-- invitar miembro (solo para el admin) -->
           <div v-if="instSeleccionada.rolUsuario === 'ADMINISTRADOR'" class="card" style="padding:1.25rem;margin-bottom:1rem">
             <h3 style="margin:0 0 1rem;font-size:0.95rem;font-weight:700">Invitar miembro por email</h3>
             <form class="invite-form" @submit.prevent="handleInvitar" style="display:flex;gap:0.75rem">
@@ -305,7 +294,6 @@
             <div v-if="inviteError" class="alert alert-error" style="margin-top:0.75rem;margin-bottom:0">{{ inviteError }}</div>
           </div>
 
-          <!-- acciones destructivas -->
           <div class="institution-danger-actions" style="display:flex;justify-content:flex-end;gap:0.75rem;margin-top:0.5rem">
             <button v-if="instSeleccionada.rolUsuario === 'MIEMBRO'" class="btn btn-danger" style="display:flex;align-items:center;gap:0.5rem" @click="confirmarSalir">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
@@ -320,7 +308,6 @@
       </div>
     </div>
 
-    <!-- confirmar salirse -->
     <div v-if="showConfirmSalir" class="modal-overlay" @click.self="showConfirmSalir = false">
       <div class="modal-box card" style="max-width:420px;width:90%;padding:2rem">
         <div style="text-align:center;margin-bottom:1.5rem">
@@ -343,7 +330,6 @@
       </div>
     </div>
 
-    <!-- confirmar eliminar -->
     <div v-if="showConfirmEliminar" class="modal-overlay" @click.self="showConfirmEliminar = false">
       <div class="modal-box card" style="max-width:420px;width:90%;padding:2rem">
         <div style="text-align:center;margin-bottom:1.5rem">
@@ -367,7 +353,6 @@
       </div>
     </div>
 
-    <!-- confirmar eliminar miembro -->
     <div v-if="showConfirmEliminarMiembro" class="modal-overlay" @click.self="showConfirmEliminarMiembro = false">
       <div class="modal-box card" style="max-width:420px;width:90%;padding:2rem">
         <div style="text-align:center;margin-bottom:1.5rem">
@@ -411,14 +396,12 @@ const authStore = useAuthStore()
 const instCtrl = useInstitucionController()
 const { instituciones, loading } = instCtrl
 
-//Biblioteca de la institución abierta (estado local, sin sub-rutas)
 const instAbierta = ref(null)
 const partiturasInst = ref([])
 const partiturasFiltradas = ref([])
 const likedIds = ref([])
 const misEtiquetas = ref([])
 const loadingBiblioteca = ref(false)
-
 const showAuth = ref(false)
 const showMenu = ref(false)
 const showCrear = ref(false)
@@ -428,7 +411,6 @@ const showConfirmSalir = ref(false)
 const showConfirmEliminar = ref(false)
 const showConfirmEliminarMiembro = ref(false)
 const memberAEliminar = ref(null)
-
 const nombreNueva = ref('')
 const descNueva = ref('')
 const crearError = ref('')
@@ -447,7 +429,6 @@ function openCrear()  { showMenu.value = false; crearError.value = ''; nombreNue
 function openUnirse() { showMenu.value = false; unirseError.value = ''; unirseEnviada.value = false; instIdUnirse.value = ''; showUnirse.value = true }
 function cerrarGestionar() { instSeleccionada.value = null }
 
-//Abrir la biblioteca de una institución al pulsar su tarjeta
 async function abrirBiblioteca(inst) {
   instAbierta.value = inst
   partiturasInst.value = []
@@ -457,8 +438,6 @@ async function abrirBiblioteca(inst) {
     partiturasInst.value = await instCtrl.getBibliotecaInstitucion(inst.id_institucion)
     partiturasFiltradas.value = partiturasInst.value
     if (authStore.user?.id) {
-      //Likes y etiquetas privadas se cargan una sola vez al abrir la
-      //biblioteca; el panel de filtro trabaja después en cliente.
       const [likes, etiquetas] = await Promise.all([
         PartituraRepository.getLikesByUser(authStore.user.id),
         EtiquetaRepository.getMisEtiquetas(authStore.user.id),
@@ -473,7 +452,6 @@ async function abrirBiblioteca(inst) {
 
 function cerrarBiblioteca() { instAbierta.value = null; partiturasInst.value = []; partiturasFiltradas.value = [] }
 
-//El panel de gestión ahora se abre desde el botón "Ajustes"
 function abrirAjustes() {
   instSeleccionada.value = instAbierta.value
   inviteError.value = ''
@@ -483,9 +461,6 @@ function abrirAjustes() {
 
 function abrirDetalle(p) { router.push('/partitura/' + p.id_partitura) }
 
-//Un miembro es "Admin" si es el administrador DE ESTA institución. Antes se
-//miraba m.usuarios.rol, que es el rol global del usuario en la aplicación
-//(casi siempre USUARIO_REGISTRADO) y no tenía nada que ver con la institución.
 function esAdminDeLaInstitucion(m) {
   return !!instSeleccionada.value && m.id_usuario === instSeleccionada.value.id_administrador
 }
@@ -498,9 +473,6 @@ async function handleCrear() {
   } catch (e) { crearError.value = e.message || 'Error al crear la institución' }
 }
 
-//Ya no se entra directamente: se envía una solicitud que el administrador
-//debe aprobar, así que el modal solo confirma que quedó pendiente (no se abre
-//la biblioteca de una institución a la que todavía no se pertenece).
 async function handleUnirse() {
   unirseError.value = ''
   try {

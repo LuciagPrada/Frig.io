@@ -68,8 +68,7 @@ router.beforeEach(async (to) => {
       const stop = authStore.$subscribe(() => {
         if (!authStore.loading) { stop(); resolve() }
       })
-      //fallback: si tarda demasiado, no bloquear la navegación indefinidamente,
-      //pero sí cancelar la suscripción para no dejarla colgada.
+      //fallback: si tarda demasiado, no bloquear la navegación indefinidamente, pero cancela la suscripción
       setTimeout(() => { stop(); resolve() }, 3000)
     })
   }

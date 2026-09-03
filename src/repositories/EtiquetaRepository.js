@@ -1,15 +1,9 @@
-//EtiquetaRepository: etiquetas privadas por usuario sobre partituras.
-//Cada usuario etiqueta libremente cualquier partitura que pueda ver (propia,
-//pública o institucional siendo miembro) y solo él ve sus propias etiquetas:
-//la RLS de etiquetas_partitura filtra siempre por auth.uid().
+//EtiquetaRepository: etiquetas privadas por usuario sobre partituras
 import SupabaseClient from './SupabaseClient.js'
 
 const getDB = () => SupabaseClient.getInstance().getDB()
 
 const EtiquetaRepository = {
-  //Todas las etiquetas del usuario (sobre cualquier partitura). Se pide una
-  //sola vez al cargar cada vista y se cruza en cliente con las partituras
-  //visibles para construir las facetas del filtro.
   async getMisEtiquetas(userId) {
     if (!userId) return []
     const db = getDB()
@@ -40,7 +34,6 @@ const EtiquetaRepository = {
     return (data || []).map(e => e.etiqueta)
   },
 
-  //Añade una etiqueta. La RLS comprueba además que el usuario puede ver la partitura.
   async añadir(idPartitura, etiqueta, userId) {
     const db = getDB()
     const { error } = await db.from('etiquetas_partitura').insert({
@@ -52,7 +45,6 @@ const EtiquetaRepository = {
     return true
   },
 
-  //Quita una etiqueta concreta (borrado por clave primaria compuesta)
   async quitar(idPartitura, etiqueta, userId) {
     const db = getDB()
     const { error } = await db

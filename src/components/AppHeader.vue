@@ -8,15 +8,13 @@
         <circle cx="18" cy="16" r="3"/>
       </svg>
       <span>{{ appName }}</span>
-    </router-link>--> <!--LOGO ANTIGUO AHORA IMAGEN-->
-    <!-- Bloque izquierdo: logo + navegación principal juntos -->
+    </router-link>-->
     <div class="header-left">
       <router-link :to="authStore.isAuthenticated ? '/dashboard' : '/'" class="logo">
         <img src="../assets/Frigio.svg" alt="Frigio Logo" width="24" height="24" style="width:24px;height:24px;object-fit:contain"/>
         <span>{{ appName }}</span>
       </router-link>
 
-      <!-- Pestañas de navegación principal -->
       <nav v-if="authStore.isAuthenticated" class="main-nav">
         <router-link to="/biblioteca" active-class="text-teal-600">
           Mi biblioteca
@@ -31,7 +29,6 @@
       </nav>
     </div>
 
-    <!-- Bloque derecho: acceso anónimo -->
     <div v-if="!authStore.isAuthenticated" class="header-auth-actions">
       <button class="btn btn-secondary" style="border-radius:9999px;padding:0.5rem 1.25rem" @click="$emit('openAuth', 'login')">
         Iniciar sesión
@@ -41,7 +38,6 @@
       </button>
     </div>
 
-    <!-- Bloque derecho: campana de notificaciones + avatar -->
     <div v-else class="header-user-actions">
       <NotificacionesBell/>
 
@@ -91,7 +87,6 @@
 
   <div v-if="mobileMenuOpen" class="mobile-nav-backdrop" @click="closeMobileMenu"/>
 
-  <!-- Backdrop para cerrar dropdown -->
   <div v-if="dropdownOpen" style="position:fixed;inset:0;z-index:99" @click="closeDropdown"/>
 </template>
 
@@ -130,7 +125,6 @@ async function handleLogout() {
 </script>
 
 <style scoped>
-/* Logo y navegación agrupados a la izquierda; el avatar queda solo a la derecha. */
 .header-left {
   display: flex;
   align-items: center;

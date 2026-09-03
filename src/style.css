@@ -25,7 +25,6 @@
   --transition: 0.2s ease;
 }
 
-/* ===== base ===== */
 *,
 *::before,
 *::after {
@@ -49,7 +48,6 @@ body,
 body { overflow-x: hidden; }
 img, canvas { max-width: 100%; }
 
-/* ===== encabezado ===== */
 .app-header {
   background: var(--color-teal);
   height: 64px;
@@ -73,7 +71,6 @@ img, canvas { max-width: 100%; }
   text-decoration: none;
 }
 
-/* ===== botones ===== */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -152,7 +149,6 @@ img, canvas { max-width: 100%; }
   transform: none !important;
 }
 
-/* ===== CARDS ===== */
 .card {
   background: var(--color-card);
   border-radius: var(--radius-md);
@@ -167,7 +163,6 @@ img, canvas { max-width: 100%; }
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
-/* ===== score card ===== */
 .score-card {
   position: relative;
   cursor: pointer;
@@ -212,7 +207,6 @@ img, canvas { max-width: 100%; }
   margin: 0.2rem 0 0;
 }
 
-/* ===== modal ===== */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -269,7 +263,6 @@ img, canvas { max-width: 100%; }
   color: var(--color-navy);
 }
 
-/* ===== FORM ===== */
 .form-group {
   margin-bottom: 1.25rem;
 }
@@ -300,7 +293,6 @@ img, canvas { max-width: 100%; }
   box-shadow: 0 0 0 3px rgba(153, 194, 185, 0.25);
 }
 
-/* ===== TABS ===== */
 .tabs {
   display: flex;
   background: var(--color-bg);
@@ -329,7 +321,6 @@ img, canvas { max-width: 100%; }
   box-shadow: var(--shadow-card);
 }
 
-/* ===== zona de subida ===== */
 .dropzone {
   border: 2.5px dashed var(--color-border);
   border-radius: var(--radius-md);
@@ -352,7 +343,6 @@ img, canvas { max-width: 100%; }
   margin-bottom: 0.75rem;
 }
 
-/* ===== layout ===== */
 .page-container {
   width: 100%;
   max-width: 1200px;
@@ -372,7 +362,6 @@ img, canvas { max-width: 100%; }
   margin: 0 0 2rem;
 }
 
-/* ===== grid ===== */
 .score-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -400,7 +389,6 @@ img, canvas { max-width: 100%; }
   gap: 1rem;
 }
 
-/* ===== barra de búsqueda ===== */
 .search-bar {
   position: relative;
   margin-bottom: 2rem;
@@ -430,7 +418,6 @@ img, canvas { max-width: 100%; }
   color: var(--color-text-secondary);
 }
 
-/* ===== avatar ===== */
 .avatar-btn {
   background: none;
   border: none;
@@ -488,7 +475,6 @@ img, canvas { max-width: 100%; }
   margin: 0.3rem 0;
 }
 
-/* ===== spinner ===== */
 .spinner {
   width: 48px;
   height: 48px;
@@ -504,7 +490,6 @@ img, canvas { max-width: 100%; }
   border-width: 2px;
 }
 
-/* ===== badge ===== */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -530,7 +515,6 @@ img, canvas { max-width: 100%; }
   color: #991b1b;
 }
 
-/* ===== animaciones ===== */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -559,7 +543,6 @@ img, canvas { max-width: 100%; }
   }
 }
 
-/* ===== alerta ===== */
 .alert {
   padding: 0.875rem 1.25rem;
   border-radius: var(--radius-sm);

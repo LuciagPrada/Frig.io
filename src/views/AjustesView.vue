@@ -9,7 +9,6 @@
       </h1>
       <p class="page-subtitle">Gestiona tu información personal y preferencias</p>
 
-      <!-- sección avatares -->
       <div class="card settings-avatar-card" style="padding:2rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:2rem">
         <div style="width:100px;height:100px;border-radius:50%;overflow:hidden;border:3px solid var(--color-teal);background:var(--color-bg);flex-shrink:0">
           <img v-if="avatarSeed" :src="`https://api.dicebear.com/9.x/avataaars/svg?seed=${avatarSeed}`" alt="Avatar" style="width:100%;height:100%;object-fit:cover"/>
@@ -29,7 +28,6 @@
         </div>
       </div>
 
-      <!-- info del perfil -->
       <div class="card settings-card" style="padding:2rem;margin-bottom:1.5rem">
         <h2 style="margin:0 0 1.5rem;font-size:1.1rem;font-weight:700">Información personal</h2>
         <div v-if="diasRestantes > 0" class="alert alert-warning" style="margin-bottom:1.5rem">
@@ -59,7 +57,6 @@
         </form>
       </div>
 
-      <!-- cambio seguro de correo -->
       <div class="card settings-card" style="padding:2rem;margin-bottom:1.5rem">
         <h2 style="margin:0 0 0.5rem;font-size:1.1rem;font-weight:700">Correo electrónico</h2>
         <p style="color:var(--color-text-secondary);font-size:0.9rem;margin:0 0 1.5rem">
@@ -101,7 +98,6 @@
         </form>
       </div>
 
-      <!-- cambio de contraseña -->
       <div class="card settings-card" style="padding:2rem;margin-bottom:1.5rem">
         <h2 style="margin:0 0 0.5rem;font-size:1.1rem;font-weight:700">Seguridad</h2>
         <p style="color:var(--color-text-secondary);font-size:0.9rem;margin:0 0 1.5rem">Se enviará un enlace seguro a tu correo electrónico para restablecer la contraseña.</p>
@@ -114,7 +110,6 @@
         </button>
       </div>
 
-      <!-- zona de peligro -->
       <div class="card settings-card" style="padding:2rem">
         <h2 style="margin:0 0 0.5rem;font-size:1.1rem;font-weight:700">Eliminar cuenta</h2>
         <p style="color:var(--color-text-secondary);font-size:0.9rem;margin:0 0 1.5rem">Elimina permanentemente tu cuenta y todos tus datos. Esta acción no se puede deshacer.</p>
@@ -125,7 +120,6 @@
       </div>
     </div>
 
-    <!-- confirmar eliminar cuenta -->
     <div v-if="showConfirmDelete" class="modal-overlay" @click.self="showConfirmDelete = false">
       <div class="modal-box card" style="max-width:420px;width:90%;padding:2rem">
         <div style="text-align:center;margin-bottom:1.5rem">
@@ -230,7 +224,6 @@ async function handleSavePerfil() {
 
     perfilSuccess.value = 'Perfil actualizado correctamente.'
 
-    //Actualizar store local
     if (authStore.user) {
       authStore.user.nombre = form.nombre
       authStore.user.apellidos = form.apellidos
@@ -276,7 +269,6 @@ async function handleChangeEmail() {
   } catch (e) {
     emailError.value = emailErrorMessage(e)
   } finally {
-    // La contraseña nunca permanece guardada en el estado de la vista.
     emailForm.password = ''
     savingEmail.value = false
   }

@@ -12,7 +12,6 @@
           <p class="page-subtitle">Descubre partituras compartidas por otros músicos y musicólogos</p>
         </div>
         <div class="page-toolbar-actions" style="margin-bottom:1.5rem">
-          <!-- filtros por etiqueta propia / instrumento / género / me gusta -->
           <ScoreFilterMenu
             v-if="!loading && partituras.length"
             :partituras="partituras"
@@ -27,7 +26,6 @@
         </div>
       </div>
 
-      <!-- barra de búsqueda -->
       <div class="search-bar">
         <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
@@ -45,12 +43,10 @@
         >✕</button>
       </div>
 
-      <!-- cargando -->
       <div v-if="loading" style="display:flex;justify-content:center;padding:3rem">
         <div class="spinner"/>
       </div>
 
-      <!-- grid de resultados -->
       <div v-else-if="partiturasFiltradas.length" class="score-grid">
         <ScoreCard
           v-for="p in partiturasFiltradas"
@@ -63,7 +59,6 @@
         />
       </div>
 
-      <!-- sin resultados -->
       <div v-else style="text-align:center;padding:4rem 2rem">
         <div style="font-size:3rem;margin-bottom:1rem;color:var(--color-text-secondary)">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -102,15 +97,12 @@ const showAuth = ref(false)
 const partiturasFiltradas = ref([])
 const misEtiquetas = ref([])
 
-//El filtro "Me gusta" reutiliza los likes que el controlador ya tiene cargados
 const likedIds = computed(() => [...userLikes.value])
 
 onMounted(async () => {
   await getFeed()
   if (authStore.isAuthenticated) {
     await loadUserLikes()
-    //Las etiquetas privadas del usuario se piden una sola vez y el panel de
-    //filtro las cruza en cliente con el feed.
     misEtiquetas.value = await EtiquetaRepository.getMisEtiquetas(authStore.user?.id)
   }
 })
@@ -121,8 +113,6 @@ watch(searchQuery, (val) => {
   searchTimeout = setTimeout(() => getFeed(val), 400)
 })
 
-//Si una búsqueda deja el feed vacío, el panel de filtro se desmonta y ya no
-//emite: hay que vaciar la lista filtrada a mano para no dejar resultados viejos.
 watch(partituras, (v) => { if (!v.length) partiturasFiltradas.value = [] })
 
 function handleSearch() { getFeed(searchQuery.value) }

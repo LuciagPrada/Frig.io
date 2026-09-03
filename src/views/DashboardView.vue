@@ -3,7 +3,6 @@
     <AppHeader @open-auth="showAuth = true"/>
 
     <div class="page-container" style="max-width:860px">
-      <!-- título -->
       <div style="text-align:center;margin-bottom:2rem;padding-top:1rem">
         <h1 class="page-title dashboard-title" style="font-size:2rem">Transcribe tus partituras manuscritas</h1>
         <p class="page-subtitle">
@@ -11,7 +10,6 @@
         </p>
       </div>
 
-      <!-- card de subida -->
       <div class="card upload-card" style="padding:2rem;margin-bottom:2rem">
         <h2 style="margin:0 0 0.25rem;font-size:1.1rem;font-weight:700">Subir partitura manuscrita</h2>
         <p style="color:var(--color-text-secondary);font-size:0.875rem;margin:0 0 1.25rem">
@@ -20,13 +18,11 @@
 
         <UploadDropzone v-model:file="selectedFile"/>
 
-        <!-- error general -->
         <div v-if="transcriptionError" class="alert alert-error" style="margin-top:1rem;display:flex;align-items:center;gap:0.5rem">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           {{ transcriptionError }}
         </div>
 
-        <!-- resultado listo -->
         <div v-if="lastResult" class="alert alert-success" style="margin-top:1rem;display:flex;align-items:flex-start;gap:0.75rem;text-align:left">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:0.1rem;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
           <div>
@@ -35,7 +31,6 @@
           </div>
         </div>
 
-        <!-- aviso de copyright + confirmación obligatoria -->
         <div class="copyright-box">
           <p class="copyright-text">
             Frigio no se hace responsable de las partituras publicadas y subidas. Todas las partituras
@@ -47,7 +42,6 @@
           </label>
         </div>
 
-        <!-- botón transcribir -->
         <button
           class="btn btn-teal btn-full"
           style="margin-top:1.25rem;font-size:1rem;padding:0.9rem;border-radius:var(--radius-sm)"
@@ -61,7 +55,6 @@
         </button>
       </div>
 
-      <!-- cards de características -->
       <div class="responsive-three-column-grid">
         <div v-for="feat in features" :key="feat.title" class="card" style="padding:1.5rem;text-align:center">
           <div style="font-size:2rem;margin-bottom:0.75rem;color:var(--color-teal)" v-html="feat.icon"></div>
@@ -71,7 +64,6 @@
       </div>
     </div>
 
-    <!-- modals -->
     <TranscribingModal
       v-if="loading && !showMetadataForm"
       :current-status="statusMsg"
@@ -111,7 +103,6 @@ const statusStep = ref(0)
 const transcriptionError = ref('')
 const lastResult = ref(null)
 const showAuth = ref(false)
-//Sin esta confirmación no se permite lanzar la transcripción
 const copyrightConfirmado = ref(false)
 
 const showMetadataForm = ref(false)
@@ -158,8 +149,6 @@ async function handleSaveFinal(metadatosEditados) {
     showMetadataForm.value = false
     selectedFile.value = null
   } catch (e) {
-    // El error ahora se pasa al modal para que el usuario lo vea.
-    // (No se usa JSON.stringify(e): podría filtrar detalles internos/stack al usuario.)
     console.error('[Dashboard] Error al guardar la partitura:', e)
     transcriptionError.value = e.message || 'Error al guardar la partitura.'
   } finally {

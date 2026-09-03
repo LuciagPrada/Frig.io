@@ -1,10 +1,4 @@
 <template>
-  <!-- Botón "Filtrar" con panel desplegable (mismo patrón que la campana de
-       notificaciones y el menú del avatar: contenedor relativo, panel absoluto
-       y backdrop fijo para cerrar al hacer click fuera). Los checkboxes solo
-       cambian la selección pendiente; hasta que no se pulsa "Aplicar" no se
-       filtra la lista de verdad (el botón "Filtrar" muestra el nº de filtros
-       ya aplicados, no el de la selección a medio hacer). -->
   <div style="position:relative;flex-shrink:0">
     <button class="btn btn-secondary filtro-btn" @click="abrir">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -15,7 +9,6 @@
     </button>
 
     <div v-if="open" class="dropdown filtro-panel">
-      <!-- Etiquetas privadas del usuario + el pseudo-filtro "Me gusta" -->
       <div class="filtro-seccion">
         <p class="filtro-titulo">Etiquetas</p>
         <label class="filtro-opcion">
@@ -57,7 +50,6 @@
       </div>
     </div>
 
-    <!-- Backdrop para cerrar el desplegable sin aplicar los cambios a medias -->
     <div v-if="open" style="position:fixed;inset:0;z-index:98" @click="open = false"/>
   </div>
 </template>
@@ -68,32 +60,22 @@ import { ref, computed, watch } from 'vue'
 const props = defineProps({
   partituras: { type: Array, default: () => [] },
   likedIds:   { type: Array, default: () => [] },
-  //Etiquetas del usuario actual: array de { id_partitura, etiqueta } tal cual
-  //lo devuelve EtiquetaRepository.getMisEtiquetas, o un Map id_partitura -> etiquetas.
   misEtiquetas: { type: [Array, Map], default: () => [] },
 })
 const emit = defineEmits(['filtered'])
 
 const open = ref(false)
 
-//Selección "pendiente": lo que se ve marcado en el panel mientras está abierto,
-//no filtra nada todavía. Arrays planos (con v-model nativo de Vue en los
-//checkboxes) en vez de Set, para evitar cualquier sorpresa de reactividad
-//con colecciones y que el propio v-model se encargue de marcar/desmarcar.
 const pendEtiquetas    = ref([])
 const pendInstrumentos = ref([])
 const pendGeneros      = ref([])
 const pendLikes        = ref(false)
 
-//Selección "aplicada": la que de verdad filtra la lista. Solo cambia al pulsar
-//"Aplicar filtros" (o "Limpiar filtros").
 const apEtiquetas    = ref([])
 const apInstrumentos = ref([])
 const apGeneros      = ref([])
 const apLikes        = ref(false)
 
-//Al abrir el panel, la selección pendiente parte de la ya aplicada (así, si
-//se cierra sin aplicar —click fuera—, no queda "a medias" la próxima vez).
 function abrir() {
   pendEtiquetas.value = [...apEtiquetas.value]
   pendInstrumentos.value = [...apInstrumentos.value]
@@ -118,8 +100,6 @@ function limpiar() {
   open.value = false
 }
 
-//Normaliza las etiquetas del usuario a un Map id_partitura -> Set(etiquetas),
-//acepte el padre un array de filas o un Map ya construido.
 const mapaEtiquetas = computed(() => {
   if (props.misEtiquetas instanceof Map) {
     const m = new Map()
@@ -137,7 +117,6 @@ const mapaEtiquetas = computed(() => {
 
 const ordenEs = (a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' })
 
-//Facetas: solo los valores realmente presentes en las partituras visibles.
 const etiquetasDisponibles = computed(() => {
   const set = new Set()
   for (const p of props.partituras) {
@@ -160,8 +139,6 @@ const generosDisponibles      = computed(() => facetaDe('genero'))
 const totalAplicados  = computed(() => apEtiquetas.value.length + apInstrumentos.value.length + apGeneros.value.length + (apLikes.value ? 1 : 0))
 const totalPendientes = computed(() => pendEtiquetas.value.length + pendInstrumentos.value.length + pendGeneros.value.length + (pendLikes.value ? 1 : 0))
 
-//Filtrado 100% en cliente, sobre la selección APLICADA: OR dentro de cada
-//categoría, AND entre categorías. Sin ninguna selección no se filtra nada.
 const filtradas = computed(() => {
   if (!totalAplicados.value) return props.partituras
   const likes = new Set(props.likedIds)
@@ -179,9 +156,6 @@ const filtradas = computed(() => {
   })
 })
 
-//Si al recargar los datos desaparece un valor ya aplicado (o pendiente), se
-//descarta para no dejar un filtro activo invisible que vacía la lista sin
-//explicación.
 function podar(refArr, disponibles) {
   const validos = new Set(disponibles)
   if (refArr.value.every(v => validos.has(v))) return

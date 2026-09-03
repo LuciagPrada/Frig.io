@@ -8,15 +8,12 @@
       <span class="comentarios-count">{{ totalComentarios }}</span>
     </h3>
 
-    <!-- Cargando -->
     <div v-if="loading" style="display:flex;justify-content:center;padding:2rem">
       <div class="spinner"/>
     </div>
 
-    <!-- Error -->
     <div v-else-if="error" class="comentarios-error">{{ error }}</div>
 
-    <!-- Lista de comentarios -->
     <div v-else class="comentarios-list">
       <div v-if="!comentarios.length" class="comentarios-empty">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 0.5rem">
@@ -25,7 +22,6 @@
         <p>No hay comentarios aún. ¡Sé el primero en comentar!</p>
       </div>
 
-      <!-- Comentario raíz-->
       <div v-for="c in comentarios" :key="c.id_comentario" class="comentario-root">
         <div class="comentario-header">
           <div class="comentario-avatar" :style="avatarStyle(c.usuarios)">
@@ -46,7 +42,6 @@
         </div>
         <p class="comentario-contenido">{{ c.contenido }}</p>
 
-        <!-- Botón Responder -->
         <button
           v-if="userId"
           class="comentario-reply-btn"
@@ -56,7 +51,6 @@
           Responder
         </button>
 
-        <!-- Caja de respuesta -->
         <div v-if="replyBoxOpen === c.id_comentario" class="reply-box">
           <textarea
             v-model="replyDraft[c.id_comentario]"
@@ -76,7 +70,6 @@
           </div>
         </div>
 
-        <!-- Mensajes, contestación al comentario-->
         <div v-if="c.mensajes && c.mensajes.length" class="mensajes-thread">
           <div v-for="m in c.mensajes" :key="m.id_mensaje" class="mensaje-item">
             <div class="comentario-avatar comentario-avatar--sm" :style="avatarStyle(m.usuarios)">
@@ -102,7 +95,6 @@
       </div>
     </div>
 
-    <!-- Añadir comentario raíz -->
     <div v-if="userId" class="add-comentario">
       <textarea
         v-model="newComentario"
@@ -175,7 +167,6 @@ async function submitComentario() {
     const created = await ComentarioRepository.addComentario(
       props.partituraId, props.userId, newComentario.value
     )
-    //recarga para tener el join completo
     newComentario.value = ''
     await loadComentarios()
   } catch (e) {
@@ -276,7 +267,6 @@ function formatRelative(iso) {
 .comentarios-empty  { text-align: center; color: var(--color-text-secondary); padding: 1.5rem 0; font-size: 0.9rem; }
 .comentarios-list   { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.25rem; }
 
-/*Comentario raíz*/
 .comentario-root {
   border: 1px solid var(--color-border, #e5e7eb);
   border-radius: var(--radius-sm, 8px);
@@ -348,8 +338,7 @@ function formatRelative(iso) {
 }
 .comentario-reply-btn:hover { color: var(--color-primary, #4a4a8a); }
 
-/* Mensajes (nivel 2) */
-.mensajes-thread {
+.mensajes-thread { //mensajes nivel 2
   margin-top: 0.75rem;
   padding-left: 1rem;
   border-left: 2px solid var(--color-border, #e5e7eb);
@@ -363,7 +352,6 @@ function formatRelative(iso) {
   align-items: flex-start;
 }
 
-/*Caja de respuesta*/
 .reply-box {
   margin-top: 0.625rem;
   padding: 0.75rem;

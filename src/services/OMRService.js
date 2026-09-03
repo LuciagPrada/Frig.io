@@ -6,7 +6,6 @@ class OMRServiceClass {
     this.apiUrl = rawUrl.replace(/\/+$/, '')
   }
 
-  //Transcribe una imagen de partitura enviándola al servidor
   async transcribir(imageFile, onStatusUpdate = () => { }) {
     onStatusUpdate('Enviando imagen al servidor OMR...', 0)
 
@@ -24,8 +23,6 @@ class OMRServiceClass {
       throw new Error(`No se pudo conectar con el servidor Jupyter en ${this.apiUrl}. Asegúrate de que la API esté corriendo.`)
     }
 
-    //Compatibilidad durante despliegues graduales: si el servidor todavía no
-    //incluye progreso, se usa el endpoint JSON anterior.
     if (response.status === 404 || response.status === 405) {
       onStatusUpdate('Analizando imagen con el modelo OMR...', 2)
       response = await fetch(`${this.apiUrl}/transcribe`, {
@@ -103,7 +100,6 @@ class OMRServiceClass {
   }
 }
 
-// Singleton
 let omrInstance = null
 export const OMRService = {
   getInstance() {
