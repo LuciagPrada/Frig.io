@@ -1,0 +1,5 @@
+Para obtener y utilizar el modelo ya entrenado y probar el cuaderno Colab_OMR_Deployment, se puede descargar desde
+
+https://drive.google.com/drive/folders/1KGTOKPEBCrYYVjgZv7I9yuR4ghtQjXX9?usp=sharing
+
+Para utilizarlo, se debe copiar el modelo a la carpeta de su Google Drive indicada en el cuaderno Colab_OMR_Deployment.
