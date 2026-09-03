@@ -71,6 +71,32 @@ const AuthRepository = {
     if (error) throw error
   },
 
+  async changeEmail({ currentEmail, newEmail, password, redirectTo }) {
+    // Una sesión abierta no basta para una operación sensible: se vuelve a
+    // comprobar la contraseña antes de solicitar el cambio a Supabase Auth.
+    const { data: sessionData, error: sessionError } = await auth.getSession()
+    if (sessionError) throw sessionError
+
+    const expectedUserId = sessionData.session?.user?.id
+    if (!expectedUserId) throw new Error('Debes iniciar sesión de nuevo para cambiar el correo.')
+
+    const { data: reauthData, error: reauthError } = await auth.signInWithPassword({
+      email: currentEmail,
+      password,
+    })
+    if (reauthError) throw reauthError
+    if (reauthData.user?.id !== expectedUserId) {
+      throw new Error('No se pudo verificar la identidad de la sesión actual.')
+    }
+
+    const { data, error } = await auth.updateUser(
+      { email: newEmail },
+      { emailRedirectTo: redirectTo }
+    )
+    if (error) throw error
+    return data
+  },
+
   async getSession() {
     const { data } = await auth.getSession()
     return data.session
