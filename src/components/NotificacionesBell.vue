@@ -8,7 +8,7 @@
       <span v-if="noLeidos" class="bell-badge">{{ noLeidos > 99 ? '99+' : noLeidos }}</span>
     </button>
 
-    <div v-if="open" class="dropdown" style="min-width:320px;max-width:360px;max-height:420px;overflow-y:auto;z-index:100">
+    <div v-if="open" class="dropdown notification-panel" style="min-width:320px;max-width:360px;max-height:420px;overflow-y:auto;z-index:100">
       <!-- Sección 1: solicitudes de ingreso a las instituciones que administra -->
       <template v-if="solicitudes.length">
         <div class="notif-head">Solicitudes de ingreso</div>
@@ -230,6 +230,19 @@ async function marcar(r) {
   font-family: inherit;
   cursor: pointer;
   border: 1px solid transparent;
+}
+
+@media (max-width: 600px) {
+  .notification-panel {
+    position: fixed;
+    top: 72px;
+    left: 0.75rem;
+    right: 0.75rem;
+    width: auto;
+    min-width: 0 !important;
+    max-width: none !important;
+    max-height: calc(100dvh - 88px) !important;
+  }
 }
 .notif-accept { background: #10b981; color: #fff; }
 .notif-accept:hover:not(:disabled) { background: #059669; }

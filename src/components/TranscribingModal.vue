@@ -27,7 +27,7 @@
 
       <p style="color:var(--color-text-secondary);font-size:0.8rem;margin:0;display:flex;align-items:center;justify-content:center;gap:0.4rem">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        Tiempo estimado: 30–60 segundos
+        El tiempo depende del número de sistemas musicales detectados
       </p>
     </div>
   </div>
@@ -38,39 +38,19 @@ import { computed } from 'vue'
 
 const props = defineProps({
   currentStatus: { type: String, default: 'Iniciando proceso...' },
+  currentStep: { type: Number, default: 0 },
 })
 
 const steps = [
-  'Cargando imagen en buffer OMR',
-  'Analizando imagen con IA Multimodal',
-  'Detectando claves, compás, notas y silencios',
-  'Mapeando elementos a estructura XML',
-  'Calculando porcentaje de fiabilidad',
-  'Generando archivo MusicXML',
-  'Guardando en tu biblioteca',
+  'Preparando la imagen',
+  'Detectando sistemas musicales',
+  'Transcribiendo los sistemas con IA',
+  'Generando el archivo MusicXML',
+  'Calculando la fiabilidad',
+  'Completando la transcripción',
 ]
 
-const statusToStep = {
-  'Subiendo imagen': 0,
-  'Enviando imagen': 0,
-  'Cargando imagen': 0,
-  'Analizando imagen': 1,
-  'Detectando claves': 2,
-  'Detectando notas': 2,
-  'Mapeando elementos': 3,
-  'Calculando porcentaje': 4,
-  'Generando archivo': 5,
-  'Generando MusicXML': 5,
-  'Guardando MusicXML': 5,
-  'Guardando en tu': 6,
-  'Procesando respuesta': 5,
-}
-
 const currentStepIndex = computed(() => {
-  const status = props.currentStatus || ''
-  for (const [key, idx] of Object.entries(statusToStep)) {
-    if (status.includes(key.split(' ')[0])) return idx
-  }
-  return 0
+  return Math.min(Math.max(Math.trunc(props.currentStep), 0), steps.length - 1)
 })
 </script>

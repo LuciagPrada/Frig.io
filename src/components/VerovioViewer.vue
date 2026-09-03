@@ -18,7 +18,7 @@
         </div>
         <!-- contenido -->
         <div v-else-if="svgContent" style="display:flex;flex-direction:column;gap:1rem">
-          <div style="display:flex;align-items:center;gap:1rem;background:var(--color-surface);padding:1rem;border-radius:var(--radius-md);border:1px solid var(--color-border)">
+          <div class="viewer-controls" style="display:flex;align-items:center;gap:1rem;background:var(--color-surface);padding:1rem;border-radius:var(--radius-md);border:1px solid var(--color-border)">
             <button class="btn btn-primary" @click="togglePlay" :disabled="!isReady" style="display:flex;align-items:center;gap:0.4rem;min-width:140px;justify-content:center">
               <svg v-if="isPlaying" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
               <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -158,3 +158,18 @@ function loadScript(src) {
   })
 }
 </script>
+
+<style scoped>
+@media (max-width: 600px) {
+  .viewer-controls {
+    align-items: stretch !important;
+    flex-direction: column;
+    gap: 0.65rem !important;
+  }
+  .viewer-controls .btn {
+    width: 100%;
+    min-width: 0 !important;
+  }
+  .viewer-controls span { margin-left: 0 !important; }
+}
+</style>

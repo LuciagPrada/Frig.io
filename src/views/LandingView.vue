@@ -3,7 +3,7 @@
     <AppHeader @open-auth="openAuth"/>
 
     <!-- seccción -->
-    <section style="background:var(--color-teal);padding:4rem 2rem;text-align:center">
+    <section class="landing-hero" style="background:var(--color-teal);padding:4rem 2rem;text-align:center">
       <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="var(--color-navy)" stroke-width="2" style="margin-bottom:1rem;margin-left:auto;margin-right:auto">
         <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
       </svg>
@@ -19,7 +19,7 @@
     <!-- contenido principal -->
     <div class="page-container" style="max-width:960px">
       <!-- CTA card -->
-      <div class="card" style="padding:2.5rem;text-align:center;margin-bottom:2rem">
+      <div class="card landing-cta" style="padding:2.5rem;text-align:center;margin-bottom:2rem">
         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-teal-dark)" stroke-width="2" style="margin-bottom:1rem;margin-left:auto;margin-right:auto">
           <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
         </svg>
@@ -70,7 +70,7 @@
       </section>
 
       <!-- tarjetas de características -->
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem">
+      <div class="responsive-three-column-grid" style="margin-bottom:2rem">
         <div class="card cursor-pointer hover-effect" style="padding:1.5rem;text-align:center;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s" @click="showProjectPopup = true">
           <div style="font-size:2rem;margin-bottom:0.75rem;color:var(--color-teal-dark)">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin:0 auto"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
@@ -99,7 +99,7 @@
     <AuthModal v-if="showAuth" :initial-tab="authTab" @close="showAuth = false"/>
 
     <!-- modal de información del proyecto -->
-    <div v-if="showProjectPopup" style="position:fixed;inset:0;background:rgba(15,23,42,0.6);backdrop-filter:blur(4px);z-index:90;display:flex;align-items:center;justify-content:center" @click.self="showProjectPopup = false">
+    <div v-if="showProjectPopup" class="landing-modal-overlay" style="position:fixed;inset:0;background:rgba(15,23,42,0.6);backdrop-filter:blur(4px);z-index:90;display:flex;align-items:center;justify-content:center" @click.self="showProjectPopup = false">
       <div class="card" style="width:100%;max-width:500px;padding:2rem;position:relative">
         <button class="btn-close" @click="showProjectPopup = false" style="position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--color-text-secondary)">&times;</button>
         <h2 style="margin:0 0 1rem;font-size:1.5rem;font-weight:700;display:flex;align-items:center;gap:0.5rem">
@@ -156,6 +156,21 @@ const howToSteps = [
 ]
 
 </script>
+
+<style scoped>
+@media (max-width: 768px) {
+  .landing-hero { padding: 2.5rem 1rem !important; }
+  .landing-hero h1 { font-size: clamp(1.8rem, 9vw, 2.25rem) !important; }
+  .landing-hero br { display: none; }
+  .landing-cta { padding: 1.5rem !important; }
+  .landing-modal-overlay { padding: 0.75rem; }
+  .landing-modal-overlay > .card {
+    max-height: calc(100dvh - 1.5rem);
+    overflow-y: auto;
+    padding: 1.5rem !important;
+  }
+}
+</style>
 <style scoped>
 .hover-effect:hover {
   transform: translateY(-4px);

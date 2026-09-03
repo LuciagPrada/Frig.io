@@ -5,14 +5,14 @@
     <div class="page-container" style="max-width:860px">
       <!-- título -->
       <div style="text-align:center;margin-bottom:2rem;padding-top:1rem">
-        <h1 class="page-title" style="font-size:2rem">Transcribe tus partituras manuscritas</h1>
+        <h1 class="page-title dashboard-title" style="font-size:2rem">Transcribe tus partituras manuscritas</h1>
         <p class="page-subtitle">
           Convierte imágenes de partituras escritas a mano en archivos digitales editables con OMR
         </p>
       </div>
 
       <!-- card de subida -->
-      <div class="card" style="padding:2rem;margin-bottom:2rem">
+      <div class="card upload-card" style="padding:2rem;margin-bottom:2rem">
         <h2 style="margin:0 0 0.25rem;font-size:1.1rem;font-weight:700">Subir partitura manuscrita</h2>
         <p style="color:var(--color-text-secondary);font-size:0.875rem;margin:0 0 1.25rem">
           Sube una imagen (JPG, PNG) de tu partitura escrita a mano
@@ -62,7 +62,7 @@
       </div>
 
       <!-- cards de características -->
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem">
+      <div class="responsive-three-column-grid">
         <div v-for="feat in features" :key="feat.title" class="card" style="padding:1.5rem;text-align:center">
           <div style="font-size:2rem;margin-bottom:0.75rem;color:var(--color-teal)" v-html="feat.icon"></div>
           <h3 style="font-size:0.95rem;font-weight:700;margin:0 0 0.4rem">{{ feat.title }}</h3>
@@ -72,12 +72,17 @@
     </div>
 
     <!-- modals -->
-    <TranscribingModal v-if="loading && !showMetadataForm" :current-status="statusMsg"/>
+    <TranscribingModal
+      v-if="loading && !showMetadataForm"
+      :current-status="statusMsg"
+      :current-step="statusStep"
+    />
     
     <ScoreMetadataForm
       v-if="showMetadataForm"
       :initial-data="aiResult.result.metadatos"
       :loading="saving"
+      :status-msg="statusMsg"
       :error-msg="transcriptionError"
       @save="handleSaveFinal"
       @cancel="showMetadataForm = false"
@@ -102,6 +107,7 @@ const selectedFile = ref(null)
 const loading = ref(false)
 const saving = ref(false)
 const statusMsg = ref('')
+const statusStep = ref(0)
 const transcriptionError = ref('')
 const lastResult = ref(null)
 const showAuth = ref(false)
@@ -118,12 +124,14 @@ async function handleTranscribir() {
   if (!authStore.isAuthenticated) { showAuth.value = true; return }
 
   loading.value = true
+  statusStep.value = 0
   transcriptionError.value = ''
   lastResult.value = null
 
   try {
-    const res = await controller.transcribirImagen(selectedFile.value, (msg) => {
+    const res = await controller.transcribirImagen(selectedFile.value, (msg, step) => {
       statusMsg.value = msg
+      if (Number.isInteger(step)) statusStep.value = step
     })
     aiResult.value = res
     showMetadataForm.value = true
@@ -132,10 +140,12 @@ async function handleTranscribir() {
   } finally {
     loading.value = false
     statusMsg.value = ''
+    statusStep.value = 0
   }
 }
 
 async function handleSaveFinal(metadatosEditados) {
+  if (saving.value) return
   saving.value = true
   transcriptionError.value = ''
   try {
@@ -185,5 +195,10 @@ const features = [
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .dashboard-title { font-size: clamp(1.45rem, 8vw, 1.8rem) !important; }
+  .upload-card { padding: 1.25rem !important; }
 }
 </style>

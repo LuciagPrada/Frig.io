@@ -7,6 +7,7 @@ import SupabaseClient from '../repositories/SupabaseClient.js'
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
   const loading = ref(true)
+  let authChangeVersion = 0
 
   const isAuthenticated = computed(() => !!user.value)
   const isAdmin = computed(() => user.value?.rol === 'ADMINISTRADOR')
@@ -20,25 +21,45 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = false
 
     //Escuchar cambios de auth
-    AuthRepository.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        await _loadProfile(session.user.id, session.user.email)
-      } else {
+    AuthRepository.onAuthStateChange((_event, session) => {
+      const version = ++authChangeVersion
+
+      if (!session?.user) {
         user.value = null
+        return
       }
+
+      const { id, email } = session.user
+
+      //Supabase ejecuta este callback dentro del lock exclusivo de Auth.
+      //Consultar la base de datos y esperar aquí intenta adquirir el mismo lock
+      //y puede bloquear indefinidamente las peticiones posteriores. Diferimos la
+      //carga hasta que el callback haya terminado y el lock se haya liberado.
+      setTimeout(async () => {
+        try {
+          const profile = await _getProfile(id, email)
+          if (version === authChangeVersion) user.value = profile
+        } catch (e) {
+          console.error('[AuthStore] No se pudo actualizar el perfil de sesión:', e)
+        }
+      }, 0)
     })
   }
 
   //El email no se lee de la tabla usuarios (columna restringida por RLS/privilegios),
   //se toma de la sesión de Supabase Auth, que ya lo incluye.
-  async function _loadProfile(uid, email) {
+  async function _getProfile(uid, email) {
     const db = SupabaseClient.getInstance().getDB()
     const { data } = await db
       .from('usuarios')
       .select('id, nombre, apellidos, nickname, rol, avatar_seed, avatar_url, last_profile_update, created_at')
       .eq('id', uid)
       .single()
-    user.value = data ? { ...data, email } : { id: uid, email }
+    return data ? { ...data, email } : { id: uid, email }
+  }
+
+  async function _loadProfile(uid, email) {
+    user.value = await _getProfile(uid, email)
   }
 
   async function login(email, pass) {

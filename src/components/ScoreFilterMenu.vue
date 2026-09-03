@@ -251,4 +251,17 @@ watch(filtradas, v => emit('filtered', v), { immediate: true })
   color: var(--color-text-secondary);
 }
 .filtro-pie { padding: 0.75rem 1rem; }
+
+@media (max-width: 600px) {
+  .filtro-panel {
+    position: fixed;
+    top: 76px;
+    left: 0.75rem;
+    right: 0.75rem;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    max-height: calc(100dvh - 92px);
+  }
+}
 </style>

@@ -5,7 +5,7 @@
         <div style="width:64px;height:64px;background:#f0fdfa;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
         </div>
-        <h2 style="margin:0;font-size:1.25rem;font-weight:700;color:var(--color-navy)">Revisar Transcripción</h2>
+        <h2 style="margin:0;font-size:1.25rem;font-weight:700;color:var(--color-navy)">Revisar transcripción</h2>
         <p style="color:var(--color-text-secondary);font-size:0.9rem;margin:0.25rem 0 0">
           La IA ha detectado estos datos. Por favor, corrígelos si es necesario.
         </p>
@@ -26,7 +26,7 @@
           <input v-model="form.autor" type="text" class="form-input" placeholder="Ej: J.S. Bach"/>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div class="metadata-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
           <div class="form-group">
             <label class="form-label">Instrumento</label>
             <input v-model="form.instrumento" type="text" class="form-input" placeholder="Ej: Piano"/>
@@ -42,7 +42,7 @@
           <input v-model="form.genero" type="text" class="form-input" placeholder="Ej: Barroco"/>
         </div>
 
-        <div style="display:flex;gap:1rem;margin-top:2rem">
+        <div class="metadata-actions" style="display:flex;gap:1rem;margin-top:2rem">
           <button type="button" class="btn btn-secondary" style="flex:1" @click="$emit('cancel')">Descartar</button>
           <button type="submit" class="btn btn-primary" style="flex:1" :disabled="loading">
             <span v-if="loading" class="spinner spinner-sm" style="margin-right:0.5rem"/>
@@ -75,6 +75,7 @@ const form = reactive({
 })
 
 function handleSubmit() {
+  if (props.loading) return
   emit('save', { ...form })
 }
 </script>
@@ -96,5 +97,20 @@ function handleSubmit() {
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 600px) {
+  .modal-overlay { padding: 0.75rem; }
+  .modal-box {
+    width: 100% !important;
+    max-height: calc(100dvh - 1.5rem);
+    overflow-y: auto;
+    padding: 1.25rem !important;
+  }
+  .metadata-grid { grid-template-columns: 1fr !important; }
+}
+
+@media (max-width: 400px) {
+  .metadata-actions { flex-direction: column; }
 }
 </style>

@@ -4,7 +4,7 @@
 
     <div class="page-container">
       <!-- cabecera -->
-      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:1.5rem">
+      <div class="page-toolbar" style="margin-bottom:1.5rem">
         <div>
           <h1 class="page-title" style="display:flex;align-items:center;gap:0.75rem;margin:0 0 0.5rem">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
@@ -14,7 +14,7 @@
             Aquí se guardan las partituras que hayas escaneado para que puedas revisarlas cuando quieras
           </p>
         </div>
-        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.25rem;flex-shrink:0">
+        <div class="page-toolbar-actions" style="margin-bottom:0.25rem">
           <!-- filtros por etiqueta propia / instrumento / género / me gusta -->
           <ScoreFilterMenu
             v-if="!loading && partituras.length"
