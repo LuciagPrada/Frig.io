@@ -90,7 +90,19 @@ class OMRServiceClass {
   }
 
   _normalizeResult(result) {
-    if (!result.musicxml) throw new Error('Respuesta inválida del servidor OMR: falta MusicXML')
+    if (typeof result.musicxml !== 'string' || !result.musicxml.trim()) {
+      throw new Error('Respuesta inválida del servidor OMR: falta MusicXML.')
+    }
+
+    const xmlDocument = new DOMParser().parseFromString(result.musicxml, 'application/xml')
+    const hasParseError = xmlDocument.querySelector('parsererror') !== null
+    const hasScore = xmlDocument.documentElement?.localName === 'score-partwise'
+    const hasMeasures = xmlDocument.querySelector('part > measure') !== null
+    if (hasParseError || !hasScore || !hasMeasures) {
+      throw new Error(
+        'El servidor OMR no ha generado una partitura válida. Comprueba que Deployment esté cargando el modelo fine-tuneado.'
+      )
+    }
 
     return {
       musicxml: result.musicxml,
