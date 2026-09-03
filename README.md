@@ -155,7 +155,8 @@ Genera una compilación de producción con:
 npm run build
 ```
 
-El archivo `vercel.json` incluye la reescritura necesaria para que las rutas de Vue Router funcionen al desplegar la SPA en Vercel. Añade allí las tres variables de entorno utilizadas localmente y asegúrate de que la API OMR permita solicitudes CORS desde el dominio de la aplicación.
+El archivo `vercel.json` incluye la reescritura necesaria para que las rutas de Vue Router funcionen al desplegar la SPA en Vercel. Añade allí las tres variables de entorno utilizadas localmente y asegúrate de que la API OMR permita solicitudes CORS desde el dominio de la aplicación. El archivo `.vercelignore` excluye `supabase/schema.sql` del paquete de despliegue. Este esquema se conserva en el repositorio como recurso de configuración y debe ejecutarse manualmente en Supabase; la aplicación compilada no lo necesita.
+
 
 ## Seguridad
 
