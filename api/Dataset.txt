@@ -1,0 +1,5 @@
+Para obtener el dataset con el que se entrenó el modelo, la carpeta con todo lo necesario es encuentra en:
+
+https://drive.google.com/file/d/1aBXigmqNQ7UCWoLlGDxP1i1u2Igky6u_/view?usp=sharing
+
+Descárgalo para obtener el dataset utilizado o para generarlo tú mismo siguiendo los pasos que seguí yo.
