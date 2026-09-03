@@ -338,7 +338,7 @@ function formatRelative(iso) {
 }
 .comentario-reply-btn:hover { color: var(--color-primary, #4a4a8a); }
 
-.mensajes-thread { //mensajes nivel 2
+.mensajes-thread { /*mensajes nivel 2*/
   margin-top: 0.75rem;
   padding-left: 1rem;
   border-left: 2px solid var(--color-border, #e5e7eb);
