@@ -789,6 +789,40 @@ async function handleEnviarReporte() {
 .modal-box { animation: fadeIn 0.2s ease; }
 @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
 
+@media (max-width: 768px) {
+  .detail-bar {
+    position: static;
+    align-items: stretch;
+    padding: 0.75rem 0.875rem;
+  }
+  .detail-bar > .btn { width: 100%; }
+  .detail-bar-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .detail-bar-actions > .btn,
+  .detail-bar-actions > div > .btn { width: 100%; }
+  .etiquetar-panel {
+    position: fixed;
+    top: 76px;
+    left: 0.75rem;
+    right: 0.75rem;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    max-height: calc(100dvh - 92px);
+  }
+  .transcripcion-svg { padding: 0.5rem; }
+  .modal-overlay { padding: 0.75rem; }
+  .modal-overlay .modal-box {
+    width: 100% !important;
+    max-height: calc(100dvh - 1.5rem);
+    overflow-y: auto;
+    padding: 1.25rem !important;
+  }
+}
+
 .btn-icon {
   width: 32px; height: 32px; border-radius: 6px;
   display: flex; align-items: center; justify-content: center;

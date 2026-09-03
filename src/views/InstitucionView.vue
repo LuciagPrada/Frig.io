@@ -4,7 +4,7 @@
 
     <!-- ====== BIBLIOTECA DE UNA INSTITUCIÓN ====== -->
     <div v-if="instAbierta" class="page-container">
-      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap">
+      <div class="institution-library-toolbar" style="display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap">
         <div>
           <button class="btn btn-secondary" style="margin-bottom:0.75rem" @click="cerrarBiblioteca">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
@@ -19,7 +19,7 @@
           </h1>
           <p class="page-subtitle" style="margin:0">Partituras compartidas con esta institución</p>
         </div>
-        <div style="display:flex;align-items:center;gap:0.75rem;flex-shrink:0">
+        <div class="institution-library-actions" style="display:flex;align-items:center;gap:0.75rem;flex-shrink:0">
           <!-- filtros por etiqueta propia / instrumento / género / me gusta -->
           <ScoreFilterMenu
             v-if="!loadingBiblioteca && partiturasInst.length"
@@ -64,7 +64,7 @@
     <!-- ====== SELECTOR DE INSTITUCIONES ====== -->
     <div v-else class="page-container" style="max-width:860px">
       <!-- cabecera -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem">
+      <div class="institution-heading" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem">
         <div>
           <h1 class="page-title" style="display:flex;align-items:center;gap:0.75rem;margin:0 0 0.4rem">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -228,7 +228,7 @@
     <!-- gestionar institución -->
     <div v-if="instSeleccionada" class="modal-overlay" @click.self="cerrarGestionar">
       <div class="modal-box card" style="max-width:680px;width:95%;padding:0;overflow:hidden">
-        <div style="padding:1.5rem 2rem;border-bottom:1px solid var(--color-border);display:flex;align-items:center;justify-content:space-between">
+        <div class="manage-modal-header" style="padding:1.5rem 2rem;border-bottom:1px solid var(--color-border);display:flex;align-items:center;justify-content:space-between">
           <div>
             <h2 style="margin:0 0 0.3rem;font-size:1.1rem;font-weight:700">{{ instSeleccionada.nombre }}</h2>
             <span class="inst-card-badge" :class="instSeleccionada.rolUsuario === 'ADMINISTRADOR' ? 'badge-admin' : 'badge-member'" style="font-size:0.75rem">
@@ -238,7 +238,7 @@
           <button class="btn-icon" @click="cerrarGestionar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
         </div>
 
-        <div style="padding:1.5rem 2rem">
+        <div class="manage-modal-body" style="padding:1.5rem 2rem">
           <!-- ID para compartir con miembros (visible para cualquier miembro) -->
           <div class="alert alert-info" style="margin-bottom:1.5rem">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-teal-dark)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
@@ -254,7 +254,7 @@
           <div v-if="gestionSuccess" class="alert alert-success" style="margin-bottom:1.5rem">{{ gestionSuccess }}</div>
 
           <!-- Tabla de miembros -->
-          <div class="card" style="overflow:hidden;margin-bottom:1.5rem">
+          <div class="card members-table-wrap" style="overflow:hidden;margin-bottom:1.5rem">
             <div style="padding:1rem 1.25rem;border-bottom:1px solid var(--color-border);font-weight:700;display:flex;align-items:center;gap:0.5rem;font-size:0.95rem">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
               Miembros ({{ (instSeleccionada.miembros_institucion || []).length }})
@@ -295,7 +295,7 @@
           <!-- invitar miembro (solo para el admin) -->
           <div v-if="instSeleccionada.rolUsuario === 'ADMINISTRADOR'" class="card" style="padding:1.25rem;margin-bottom:1rem">
             <h3 style="margin:0 0 1rem;font-size:0.95rem;font-weight:700">Invitar miembro por email</h3>
-            <form @submit.prevent="handleInvitar" style="display:flex;gap:0.75rem">
+            <form class="invite-form" @submit.prevent="handleInvitar" style="display:flex;gap:0.75rem">
               <input v-model="emailInvitacion" type="email" class="form-input" placeholder="usuario@email.com" required style="flex:1"/>
               <button type="submit" class="btn btn-primary" :disabled="instCtrl.loading.value">
                 <span v-if="instCtrl.loading.value" class="spinner spinner-sm"/>
@@ -306,7 +306,7 @@
           </div>
 
           <!-- acciones destructivas -->
-          <div style="display:flex;justify-content:flex-end;gap:0.75rem;margin-top:0.5rem">
+          <div class="institution-danger-actions" style="display:flex;justify-content:flex-end;gap:0.75rem;margin-top:0.5rem">
             <button v-if="instSeleccionada.rolUsuario === 'MIEMBRO'" class="btn btn-danger" style="display:flex;align-items:center;gap:0.5rem" @click="confirmarSalir">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
               Salirme de la institución
@@ -636,4 +636,36 @@ function copiarId(id) {
   color: var(--color-text-primary); transition: background 0.15s;
 }
 .dropdown-item:hover { background: var(--color-bg); }
+
+@media (max-width: 768px) {
+  .institution-library-toolbar,
+  .institution-heading {
+    align-items: stretch !important;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .institution-library-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .institution-library-actions > .btn { flex: 1 1 auto; }
+  .inst-grid { grid-template-columns: 1fr; }
+
+  .modal-overlay { padding: 0.75rem; }
+  .modal-box {
+    width: 100% !important;
+    max-height: calc(100dvh - 1.5rem);
+    overflow-y: auto !important;
+  }
+  .manage-modal-header,
+  .manage-modal-body { padding: 1rem !important; }
+  .members-table-wrap { overflow-x: auto !important; }
+  .members-table-wrap table { min-width: 520px; }
+  .invite-form,
+  .institution-danger-actions {
+    flex-direction: column;
+  }
+  .invite-form .btn,
+  .institution-danger-actions .btn { width: 100%; }
+}
 </style>

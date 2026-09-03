@@ -3,7 +3,7 @@
     <AppHeader @open-auth="showAuth = true"/>
 
     <div class="page-container">
-      <div style="display:flex;justify-content:space-between;align-items:flex-end">
+      <div class="page-toolbar">
         <div>
           <h1 class="page-title" style="display:flex;align-items:center;gap:0.75rem">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
@@ -11,7 +11,7 @@
           </h1>
           <p class="page-subtitle">Descubre partituras compartidas por otros músicos y musicólogos</p>
         </div>
-        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1.5rem;flex-shrink:0">
+        <div class="page-toolbar-actions" style="margin-bottom:1.5rem">
           <!-- filtros por etiqueta propia / instrumento / género / me gusta -->
           <ScoreFilterMenu
             v-if="!loading && partituras.length"

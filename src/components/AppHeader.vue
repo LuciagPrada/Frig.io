@@ -17,22 +17,22 @@
       </router-link>
 
       <!-- Pestañas de navegación principal -->
-      <nav v-if="authStore.isAuthenticated" style="display:flex;gap:1.5rem;font-weight:600;color:var(--color-navy)">
-        <router-link to="/biblioteca" style="text-decoration:none;color:inherit" active-class="text-teal-600">
+      <nav v-if="authStore.isAuthenticated" class="main-nav">
+        <router-link to="/biblioteca" active-class="text-teal-600">
           Mi biblioteca
         </router-link>
         
-        <router-link to="/mis-instituciones" style="text-decoration:none;color:inherit" active-class="text-teal-600">
+        <router-link to="/mis-instituciones" active-class="text-teal-600">
           Mis instituciones
         </router-link>
-        <router-link to="/comunidad" style="text-decoration:none;color:inherit" active-class="text-teal-600">
+        <router-link to="/comunidad" active-class="text-teal-600">
           Comunidad
         </router-link>
       </nav>
     </div>
 
     <!-- Bloque derecho: acceso anónimo -->
-    <div v-if="!authStore.isAuthenticated" class="flex gap-2">
+    <div v-if="!authStore.isAuthenticated" class="header-auth-actions">
       <button class="btn btn-secondary" style="border-radius:9999px;padding:0.5rem 1.25rem" @click="$emit('openAuth', 'login')">
         Iniciar sesión
       </button>
@@ -42,7 +42,7 @@
     </div>
 
     <!-- Bloque derecho: campana de notificaciones + avatar -->
-    <div v-else class="flex gap-3 items-center">
+    <div v-else class="header-user-actions">
       <NotificacionesBell/>
 
       <div style="position:relative">
@@ -67,8 +67,29 @@
           </button>
         </div>
       </div>
+
+      <button
+        class="mobile-menu-btn"
+        type="button"
+        aria-label="Abrir menú de navegación"
+        aria-controls="mobile-navigation"
+        :aria-expanded="mobileMenuOpen"
+        @click="toggleMobileMenu"
+      >
+        <svg v-if="!mobileMenuOpen" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        <svg v-else width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
     </div>
   </header>
+
+  <nav v-if="authStore.isAuthenticated && mobileMenuOpen" id="mobile-navigation" class="mobile-nav">
+    <router-link to="/dashboard" active-class="active" @click="closeMobileMenu">Transcribir</router-link>
+    <router-link to="/biblioteca" active-class="active" @click="closeMobileMenu">Mi biblioteca</router-link>
+    <router-link to="/mis-instituciones" active-class="active" @click="closeMobileMenu">Mis instituciones</router-link>
+    <router-link to="/comunidad" active-class="active" @click="closeMobileMenu">Comunidad</router-link>
+  </nav>
+
+  <div v-if="mobileMenuOpen" class="mobile-nav-backdrop" @click="closeMobileMenu"/>
 
   <!-- Backdrop para cerrar dropdown -->
   <div v-if="dropdownOpen" style="position:fixed;inset:0;z-index:99" @click="closeDropdown"/>
@@ -87,12 +108,22 @@ const authStore = useAuthStore()
 const router = useRouter()
 const dropdownOpen = ref(false)
 const avatarLoadFailed = ref(false)
+const mobileMenuOpen = ref(false)
 
-function toggleDropdown() { dropdownOpen.value = !dropdownOpen.value }
+function toggleDropdown() {
+  mobileMenuOpen.value = false
+  dropdownOpen.value = !dropdownOpen.value
+}
 function closeDropdown() { dropdownOpen.value = false }
+function toggleMobileMenu() {
+  dropdownOpen.value = false
+  mobileMenuOpen.value = !mobileMenuOpen.value
+}
+function closeMobileMenu() { mobileMenuOpen.value = false }
 
 async function handleLogout() {
   closeDropdown()
+  closeMobileMenu()
   await authStore.logout()
   router.push('/')
 }
@@ -105,5 +136,72 @@ async function handleLogout() {
   align-items: center;
   gap: 2.5rem;
   min-width: 0;
+}
+
+.main-nav,
+.header-auth-actions,
+.header-user-actions {
+  display: flex;
+  align-items: center;
+}
+.main-nav { gap: 1.5rem; font-weight: 600; color: var(--color-navy); }
+.main-nav a { color: inherit; text-decoration: none; white-space: nowrap; }
+.header-auth-actions { gap: 0.5rem; }
+.header-user-actions { gap: 0.75rem; }
+.mobile-menu-btn,
+.mobile-nav,
+.mobile-nav-backdrop { display: none; }
+
+@media (max-width: 768px) {
+  .header-left { gap: 0; }
+  .main-nav { display: none; }
+  .header-user-actions { gap: 0.4rem; }
+  .mobile-menu-btn {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    color: var(--color-navy);
+    cursor: pointer;
+  }
+  .mobile-nav {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+    z-index: 120;
+    display: grid;
+    padding: 0.5rem 0.75rem 0.75rem;
+    background: var(--color-teal);
+    border-top: 1px solid rgba(15,23,42,0.12);
+    box-shadow: 0 10px 24px rgba(15,23,42,0.18);
+  }
+  .mobile-nav a {
+    padding: 0.8rem 0.9rem;
+    border-radius: var(--radius-sm);
+    color: var(--color-navy);
+    font-weight: 650;
+    text-decoration: none;
+  }
+  .mobile-nav a.active { background: rgba(255,255,255,0.48); }
+  .mobile-nav-backdrop {
+    position: fixed;
+    inset: 64px 0 0;
+    z-index: 99;
+    display: block;
+    background: rgba(15,23,42,0.3);
+  }
+}
+
+@media (max-width: 480px) {
+  .header-auth-actions { gap: 0.35rem; }
+  .header-auth-actions .btn {
+    padding: 0.45rem 0.7rem !important;
+    font-size: 0.76rem;
+  }
 }
 </style>

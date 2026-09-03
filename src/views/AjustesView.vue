@@ -10,7 +10,7 @@
       <p class="page-subtitle">Gestiona tu información personal y preferencias</p>
 
       <!-- sección avatares -->
-      <div class="card" style="padding:2rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:2rem">
+      <div class="card settings-avatar-card" style="padding:2rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:2rem">
         <div style="width:100px;height:100px;border-radius:50%;overflow:hidden;border:3px solid var(--color-teal);background:var(--color-bg);flex-shrink:0">
           <img v-if="avatarSeed" :src="`https://api.dicebear.com/9.x/avataaars/svg?seed=${avatarSeed}`" alt="Avatar" style="width:100%;height:100%;object-fit:cover"/>
           <svg v-else width="100" height="100" viewBox="0 0 40 40" fill="none">
@@ -30,13 +30,13 @@
       </div>
 
       <!-- info del perfil -->
-      <div class="card" style="padding:2rem;margin-bottom:1.5rem">
+      <div class="card settings-card" style="padding:2rem;margin-bottom:1.5rem">
         <h2 style="margin:0 0 1.5rem;font-size:1.1rem;font-weight:700">Información personal</h2>
         <div v-if="diasRestantes > 0" class="alert alert-warning" style="margin-bottom:1.5rem">
           No puedes modificar tu nombre o nickname hasta que pasen {{ diasRestantes }} días desde la última vez que los editaste.
         </div>
         <form @submit.prevent="handleSavePerfil">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
+          <div class="settings-name-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
             <div class="form-group">
               <label class="form-label">Nombre</label>
               <input v-model="form.nombre" type="text" class="form-input" placeholder="Tu nombre" :disabled="diasRestantes > 0"/>
@@ -65,7 +65,7 @@
       </div>
 
       <!-- cambio de contraseña -->
-      <div class="card" style="padding:2rem;margin-bottom:1.5rem">
+      <div class="card settings-card" style="padding:2rem;margin-bottom:1.5rem">
         <h2 style="margin:0 0 0.5rem;font-size:1.1rem;font-weight:700">Seguridad</h2>
         <p style="color:var(--color-text-secondary);font-size:0.9rem;margin:0 0 1.5rem">Se enviará un enlace seguro a tu correo electrónico para restablecer la contraseña.</p>
         <div v-if="passError" class="alert alert-error" style="margin-bottom:1rem"> {{ passError }}</div>
@@ -78,7 +78,7 @@
       </div>
 
       <!-- zona de peligro -->
-      <div class="card" style="padding:2rem">
+      <div class="card settings-card" style="padding:2rem">
         <h2 style="margin:0 0 0.5rem;font-size:1.1rem;font-weight:700">Eliminar cuenta</h2>
         <p style="color:var(--color-text-secondary);font-size:0.9rem;margin:0 0 1.5rem">Elimina permanentemente tu cuenta y todos tus datos. Esta acción no se puede deshacer.</p>
         <button class="btn btn-danger" style="display:flex;align-items:center;gap:0.5rem" @click="confirmarEliminarCuenta">
@@ -238,4 +238,22 @@ async function handleEliminarCuenta() {
 }
 .modal-box { animation: fadeIn 0.2s ease; }
 @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+@media (max-width: 600px) {
+  .settings-avatar-card {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 1rem !important;
+    padding: 1.25rem !important;
+  }
+  .settings-card { padding: 1.25rem !important; }
+  .settings-name-grid { grid-template-columns: 1fr !important; }
+  .modal-overlay { padding: 0.75rem; }
+  .modal-box {
+    width: 100% !important;
+    max-height: calc(100dvh - 1.5rem);
+    overflow-y: auto;
+    padding: 1.25rem !important;
+  }
+}
 </style>

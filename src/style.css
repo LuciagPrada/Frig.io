@@ -11,6 +11,7 @@
   --color-navy: #0F172A;
   --color-bg: #F1F5F9;
   --color-card: #FFFFFF;
+  --color-surface: #FFFFFF;
   --color-text-primary: #0F172A;
   --color-text-secondary: #64748B;
   --color-border: #E2E8F0;
@@ -41,7 +42,12 @@ body,
   background: var(--color-bg);
   color: var(--color-text-primary);
   -webkit-font-smoothing: antialiased;
+  width: 100%;
+  max-width: 100%;
 }
+
+body { overflow-x: hidden; }
+img, canvas { max-width: 100%; }
 
 /* ===== encabezado ===== */
 .app-header {
@@ -348,6 +354,7 @@ body,
 
 /* ===== layout ===== */
 .page-container {
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
@@ -370,6 +377,27 @@ body,
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 1.25rem;
+}
+
+.page-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.page-toolbar > * { min-width: 0; }
+.page-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.responsive-three-column-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
 }
 
 /* ===== barra de búsqueda ===== */
@@ -564,4 +592,44 @@ body,
   background: rgba(153, 194, 185, 0.15);
   color: var(--color-navy);
   border-left: 4px solid var(--color-teal);
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    height: 64px;
+    padding: 0 0.875rem;
+  }
+
+  .page-container { padding: 1.25rem 0.875rem; }
+  .page-title { font-size: clamp(1.35rem, 7vw, 1.65rem); }
+  .page-subtitle { margin-bottom: 1.25rem; }
+
+  .page-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .page-toolbar-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .page-toolbar-actions > .btn { flex: 1 1 auto; }
+
+  .responsive-three-column-grid { grid-template-columns: 1fr; }
+  .score-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.875rem;
+  }
+
+  .modal-backdrop { padding: 0.625rem; }
+  .modal {
+    max-width: calc(100vw - 1.25rem);
+    max-height: calc(100dvh - 1.25rem);
+  }
+  .modal-header { padding: 1rem; }
+  .modal-body { padding: 1rem; }
+}
+
+@media (max-width: 480px) {
+  .score-grid { grid-template-columns: 1fr; }
+  .btn { padding-left: 0.9rem; padding-right: 0.9rem; }
 }

@@ -3,7 +3,7 @@
   <div class="modal-backdrop" @click.self="$emit('close')">
     <div class="modal modal-sm" style="padding:0">
       <!-- Tabs -->
-      <div style="padding:1.5rem 2rem 0">
+      <div class="auth-modal-header" style="padding:1.5rem 2rem 0">
         <h2 style="margin:0 0 0.25rem;font-size:1.25rem;font-weight:700">Accede a tu cuenta</h2>
         <p style="color:var(--color-text-secondary);font-size:0.875rem;margin:0 0 1.25rem">
           Inicia sesión o crea una cuenta para guardar tus partituras
@@ -15,7 +15,7 @@
       </div>
 
       <!-- Formulario -->
-      <div style="padding:1.5rem 2rem 2rem">
+      <div class="auth-modal-body" style="padding:1.5rem 2rem 2rem">
         <!-- alerta error -->
         <div v-if="error" class="alert alert-error" style="display:flex;align-items:center;gap:0.5rem">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
@@ -46,7 +46,7 @@
 
         <!-- REGISTRO -->
         <form v-else @submit.prevent="handleRegister">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
+          <div class="auth-name-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
             <div class="form-group">
               <label class="form-label">Nombre</label>
               <input v-model="form.nombre" type="text" class="form-input" placeholder="Tu nombre" required/>
@@ -148,4 +148,10 @@ async function handleRegister() {
   color: var(--color-text-secondary);
 }
 .password-toggle:hover { color: var(--color-text-primary); }
+
+@media (max-width: 480px) {
+  .auth-modal-header { padding: 1.25rem 1.25rem 0 !important; }
+  .auth-modal-body { padding: 1.25rem !important; }
+  .auth-name-grid { grid-template-columns: 1fr !important; }
+}
 </style>
