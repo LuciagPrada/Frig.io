@@ -4,6 +4,8 @@ Frig.io es una aplicación web de **Reconocimiento Óptico de Música (OMR)** or
 
 Además de la transcripción, la plataforma ofrece una biblioteca personal, publicación de partituras en una comunidad, comentarios, likes, reportes y espacios compartidos para instituciones.
 
+Este proyecto está bajo la licencia GNU General Public License v3.0. Consulta el archivo LICENSE para más detalles.
+
 ## Funcionalidades
 
 - Registro, inicio de sesión y gestión del perfil con Supabase Auth.
