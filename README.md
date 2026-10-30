@@ -170,4 +170,4 @@ El archivo `vercel.json` incluye la reescritura necesaria para que las rutas de 
 
 ## Licencia
 
-Este repositorio no incluye actualmente un archivo de licencia. Antes de redistribuirlo o aceptar contribuciones, añade una licencia que refleje las condiciones de uso del proyecto.
+Este repositorio está licenciado bajo la                 GNU GENERAL PUBLIC LICENSE. Lee el archivo LICENSE para saber las condiciones de uso.
